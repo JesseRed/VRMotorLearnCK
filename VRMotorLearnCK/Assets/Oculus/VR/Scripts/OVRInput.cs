@@ -611,8 +611,13 @@ public static class OVRInput
 				}
 			case Controller.RTouch:
 			case Controller.RHand:
-				if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus)
+				if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus){
+					//Debug.Log("return from OVRInputs=" + OVRPlugin.GetNodePose(OVRPlugin.Node.HandRight, stepType).ToOVRPose().orientation);
+					//Vector4 tmp = new Vector4(OVRPlugin.GetNodePose(OVRPlugin.Node.HandRight, stepType).ToOVRPose().orientation);
+					//tmp[0] += 0.1f;
+					//return tmp;
 					return OVRPlugin.GetNodePose(OVRPlugin.Node.HandRight, stepType).ToOVRPose().orientation;
+				}
 				else if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
 					return openVRControllerDetails[1].localOrientation;
 				else

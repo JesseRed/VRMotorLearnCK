@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class LineObj : MonoBehaviour
 {
-    private LineRenderer lineRenderer;
+    private LineRenderer line;
 
     public float lineDrawSpeed = 6f;
     // Start is called before the first frame update
     void Start()
     {
-        lineRenderer = GetComponent<LineRenderer>();
+        line = GetComponent<LineRenderer>();
         //lineRenderer.SetPosition(0, new Vector3(-1f, 0.3f, -0.7f));
         // //lineRenderer.SetWidth(0.45f, 0.45f);
         // lineRenderer.startWidth =0.1f;
@@ -27,8 +27,8 @@ public class LineObj : MonoBehaviour
         // lineRenderer.SetPosition(0, pointA);
         // lineRenderer.SetPosition(1, pointB);
         // //lineRenderer.SetPosition(2, pointA);
-        drawCircle(lineRenderer, 0.3f,0.03f, transform);
-        Debug.Log(transform.position.x + " " + transform.position.y);
+        //drawCircleX(0.1f,0.012f); //, transform);
+        //Debug.Log(transform.position.x + " " + transform.position.y);
     }
 
     // Update is called once per frame
@@ -43,9 +43,10 @@ public class LineObj : MonoBehaviour
     }
 
    // public void DrawCircle(this GameObject container, float radius, float lineWidth)
-    public void drawCircle(LineRenderer line, float radius, float lineWidth, Transform origin)
+    public void drawCircleX(float radius, float lineWidth) //, Transform origin)
     {
-        var segments = 360;
+        Debug.Log("draw");
+        var segments = 60;
         //var line = container.AddComponent<LineRenderer>();
         line.useWorldSpace = false;
         line.startWidth = lineWidth;
@@ -58,7 +59,7 @@ public class LineObj : MonoBehaviour
         for (int i = 0; i < pointCount; i++)
         {
             var rad = Mathf.Deg2Rad * (i * 360f / segments);
-            points[i] = new Vector3(Mathf.Sin(rad) * radius  ,  Mathf.Cos(rad) * radius, -0.1f);
+            points[i] = new Vector3(Mathf.Sin(rad) * radius  ,  Mathf.Cos(rad) * radius, -0.43f);
         }
 
         line.SetPositions(points);

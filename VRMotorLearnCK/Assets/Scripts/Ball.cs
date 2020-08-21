@@ -8,43 +8,114 @@ public class Ball : MonoBehaviour
     
     private int x = 0;
     public MyGameManager myGameManager;
-    public SaveData saveData;
+    public GameSession gameSession;
+    //public PlayerData playerData;
     private bool in_destroy_process = false;
     private bool ball_was_taken = false;
     private bool is_Hit = false;
     private int ID;
- 
+    
+    private OVRPlayerController ovrPlayerController;
+    public DrawDot drawDot;
     private bool is_grabbed = false;
-
-    private float target_radius;
+    public GameObject wall;
     private GameObject leftHand, rightHand;
     private Transform leftHandPosition, rightHandPosition;
     // Start is called before the first frame update
+    public GameObject trefferPrefab;
+    public LineObj lineObj;
+    
+    public Parameter parameter;
+    public Rigidbody rb;
+
+    //* alle Variablen die mit einem "par_" beginnen muessen mit dem aktuellen
+    //* Ball gespeichert werden und beschreiben die Wurfparameter
+    private float par_target_radius;
+    public float par_mass;
+    public Vector3 par_gravity;
+    public Vector3 par_offset_hand_pos;
+
     void Start()
     {
         print("start the BAll Script on Start of Object Ball");
         myGameManager = FindObjectOfType<MyGameManager>();
-        saveData = FindObjectOfType<SaveData>();
+        gameSession = FindObjectOfType<GameSession>();
+        parameter = FindObjectOfType<Parameter>();
         EventManager.StartListening ("Treffer", registerTreffer);
-        ID = myGameManager.get_new_Ball_ID();
-        target_radius = myGameManager.get_current_target_radius();
-        leftHand = GameObject.Find("LeftHandAnchor");
+        ovrPlayerController = FindObjectOfType<OVRPlayerController>();
+        wall = GameObject.Find("Wall");
+        drawDot = FindObjectOfType<DrawDot>();
+        lineObj = FindObjectOfType<LineObj>();
+        //leftHand = GameObject.Find("LeftHandAnchor");
+        //rightHand = GameObject.Find("RightHandAnchor");
+        leftHand = GameObject.Find("CustomHandLeft");
+        rightHand = GameObject.Find("CustomHandRight");
         rightHand = GameObject.Find("RightHandAnchor");
-        leftHandPosition = leftHand.transform;
-        rightHandPosition = rightHand.transform;
+        
+
+        rb = GetComponent<Rigidbody>(); 
+        
+
+        ID = myGameManager.get_current_Ball_ID();
+
+        set_target_radius();
+        set_physics();
+        set_hand_controller();
+        
+        //Debug.Log("wall scale = " + wall.transform.localScale.x ToString());
+        //TODO Die Methode muss noch angepasst werden um alle Paramter mit zu speichern
+        gameSession.register_new_Ball(ID, par_mass);
     }
 
+    //* das Paramter Object wird durch den Gamemanager immer vor dem Spawnen 
+    // eines neuen Balls geschrieben und ist zum Zeitpunkt des Balls
+    private void set_target_radius()
+    {
+        par_target_radius = parameter.current_target_radius;
+        Debug.Log("target_radius in ball = " + par_target_radius);
+        lineObj.drawCircleX(par_target_radius, 0.051f);
+
+    }
+
+    private void set_physics()
+    {
+
+        par_mass = parameter.current_ball_mass;
+        rb.mass = par_mass;
+        rb.useGravity = false;
+        //Debug.Log("par_mas = " + par_mas);
+        par_gravity = parameter.get_gravitiy();
+        Physics.gravity = par_gravity;
+
+    }
+
+    private void set_hand_controller()
+    {
+        
+        OVRPlugin.carsten_offset_hand_pos = parameter.current_offset_hand_pos;
+        OVRPlugin.carsten_offset_hand_vel = parameter.current_offset_hand_vel;
+        OVRPlugin.carsten_invert = parameter.current_invert;
+        OVRPlugin.carsten_tremor = parameter.current_tremor;
+        
+        
+        
+        //rightHand.transform.position = rightHand.transform.position  + parameter.current_offset_hand_pos;
+        //rightHand.transform.position = rightHand.transform.position  + new Vector3(0.2f, 0.0f, 0.0f);
+        Debug.Log("offset = " + parameter.current_offset_hand_pos.ToString());
+        Debug.Log("transform right hand to " + rightHand.transform.position.ToString());
+        
+    }
 
     // Update is called once per frame
     void Update()
     {
-            saveData.add_Ball_Hand_Position(ID, 
+            gameSession.add_Ball_Hand_Position(ID, 
             transform.position.x,
             transform.position.y,
             transform.position.z,
-            rightHandPosition.position.x, 
-            rightHandPosition.position.y, 
-            rightHandPosition.position.z, 
+            rightHand.transform.position.x, 
+            rightHand.transform.position.y, 
+            rightHand.transform.position.z, 
             Time.time);
         
         //Debug.Log("Grabbed = " + transform.GetComponent<OVRGrabbable>().isGrabbed);
@@ -52,14 +123,15 @@ public class Ball : MonoBehaviour
         // test if Ball was grabbed
         if (!is_grabbed && transform.GetComponent<OVRGrabbable>().isGrabbed){
             is_grabbed = true;
-            saveData.set_pick_up_time(ID, Time.time);
+            gameSession.set_pick_up_time(ID, Time.time);
             ball_was_taken = true; // this is set one time and markes the start of the recording of the ball position
+            rb.useGravity = true;
         }
         if (is_grabbed && !transform.GetComponent<OVRGrabbable>().isGrabbed){
             // The ball was grapped in the past and is now released
             // this is necessary if the ball was grapped a second time
             is_grabbed = false;
-            saveData.set_leave_the_Hand_Time(ID, Time.time);
+            gameSession.set_leave_the_Hand_Time(ID, Time.time);
         }
     }
 
@@ -69,7 +141,7 @@ public class Ball : MonoBehaviour
         {
             case "Ring":
                 //print("HHHHHHHHHHHHHHHHHHHHHRingTriggerv XXXX");
-                saveData.set_Hit(ID, 1);
+                gameSession.set_Hit(ID, 1);
                 EventManager.TriggerEvent("Treffer");
                 if (!in_destroy_process){
                     in_destroy_process = true;
@@ -77,20 +149,14 @@ public class Ball : MonoBehaviour
                     EventManager.TriggerEvent("SpawnNewBall");
                 }  
                 break;
-            //case "Hole":
-            //    EventManager.TriggerEvent("Treffer");
-            //    break;
-            //case "Ground":
-                //print("Ground");
-                //EventManager.TriggerEvent("Destroy");
-               // break;
+
             
         }
     }
 
     void OnCollisionEnter(Collision col)
     {
-        Debug.Log("XXXXXXXXXXXXXXXXX   Collided with " + col.gameObject.tag);
+        //Debug.Log("XXXXXXXXXXXXXXXXX   Collided with " + col.gameObject.tag);
 
         switch(col.gameObject.tag)
         {
@@ -105,17 +171,21 @@ public class Ball : MonoBehaviour
                     EventManager.TriggerEvent("SpawnNewBall");
                 }            
                 break;
-                case "Wall":
+            case "Wall":
                 // check whether it is in the target radius
                 ContactPoint contact = col.GetContact(0);
-                float deviation = Vector3.Distance(contact.point, new Vector3(0f,0f,0f));
+                float deviation = Vector3.Distance(contact.point, new Vector3(0f,0f,-0.1f))/((wall.transform.localScale.x+wall.transform.localScale.y)/2);
                 Debug.Log("Hit with deviation of : " + deviation);
-                if (deviation<target_radius){
+                bool is_hit = false;
+                if (deviation<par_target_radius){
+                    is_hit = true;
                     Debug.Log("Hit the Wall in Position x =" + transform.position.x + "y=" + transform.position.y + "z="+transform.position.z);
-                    saveData.set_Hit(ID, 1);
+                    gameSession.set_Hit(ID, 1);
                     EventManager.TriggerEvent("Treffer");
-                    Instantiate(trefferPrefab, contact.point, new Quaternion() )
+                    //Instantiate(trefferPrefab, contact.point, new Quaternion() );
                 }
+                drawDot.drawTheDot(contact.point, is_hit);
+                Debug.Log("deviation = " + deviation + "   vs. par_target_radius = " + par_target_radius);
                 //print("HHHHHHHHHHHHHHHHHHHHHRingTriggerv XXXX");
                 
                 // print("Points colliding: " + col.contacts.Length);
@@ -152,7 +222,7 @@ public class Ball : MonoBehaviour
     void registerTreffer()
     {
         Debug.Log("HHHHHHHHHHHHHHHHHHHHHHHIIIIIIIIIIIITTTTTT a Hit was registered in the Game Manager");
-        saveData.SaveIntoJson();
+        gameSession.SaveIntoJson();
     }
 
 

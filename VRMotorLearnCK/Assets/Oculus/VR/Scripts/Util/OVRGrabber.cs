@@ -172,7 +172,7 @@ public class OVRGrabber : MonoBehaviour
 		// Update values from inputs
 		m_prevFlex = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, m_controller);
         // Edited by Carsten
-		m_prevFlex = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, m_controller);
+		//m_prevFlex = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, m_controller);
 
 		CheckForGrabOrRelease(prevFlex);
     }

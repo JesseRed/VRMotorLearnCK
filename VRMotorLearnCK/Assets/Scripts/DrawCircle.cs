@@ -30,8 +30,8 @@ public class DrawCircle : MonoBehaviour
         // lineRenderer.SetPosition(0, pointA);
         // lineRenderer.SetPosition(1, pointB);
         // //lineRenderer.SetPosition(2, pointA);
-        DrawMyCircle(lineRenderer, 0.3f,0.03f, transform);
-        Debug.Log(transform.position.x + " " + transform.position.y);
+        //DrawMyCircle(lineRenderer, 0.3f,0.03f, transform);
+        //Debug.Log(transform.position.x + " " + transform.position.y);
     }
 
     // Update is called once per frame

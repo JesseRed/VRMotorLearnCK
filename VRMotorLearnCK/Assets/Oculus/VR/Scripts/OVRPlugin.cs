@@ -38,6 +38,11 @@ using UnityEngine;
 
 public static class OVRPlugin
 {
+
+	public static Vector3 carsten_offset_hand_pos;
+	public static Vector3 carsten_offset_hand_vel;
+	public static Vector3 carsten_invert;
+	public static Vector4 carsten_tremor;
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
 	public const bool isSupportedPlatform = false;
 #else
@@ -2002,16 +2007,44 @@ public static class OVRPlugin
 #endif
 	}
 
+	
+
 	public static Posef GetNodePose(Node nodeId, Step stepId)
 	{
+		//Debug.Log("OVRPlugin GetNodePos= " + nodeId.ToString() + "stepId" + stepId.ToString());
+		//Debug.Log("version = " + version.ToString());
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
 		return Posef.identity;
 #else
-		if (version >= OVRP_1_12_0.version)
-			return OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose;
+		if (version >= OVRP_1_12_0.version){
+			//Debug.Log("version > 1_12");
+			//Debug.Log("return =" + OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose.ToString());
+			Posef tmp = OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose ;
+			tmp.Position.x += carsten_offset_hand_pos[0];
+			tmp.Position.y += carsten_offset_hand_pos[1];
+			tmp.Position.z += carsten_offset_hand_pos[2];
+			tmp.Position.x *= carsten_offset_hand_vel[0];
+			tmp.Position.y *= carsten_offset_hand_vel[1];
+			tmp.Position.z *= carsten_offset_hand_vel[2];
 
-		if (version >= OVRP_1_8_0.version && stepId == Step.Physics)
+			tmp.Position.x *= carsten_invert[0];
+			tmp.Position.y *= carsten_invert[1];
+			tmp.Position.z *= carsten_invert[2];
+
+			// Tremor
+			tmp.Position.x *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[0]/10*-1.0f);
+			tmp.Position.y *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[1]/10*-1.0f);
+			tmp.Position.z *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[2]/10*-1.0f);
+	
+			
+			return tmp;
+//			return OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose ;
+		}
+		if (version >= OVRP_1_8_0.version && stepId == Step.Physics){
+			//Debug.Log("version > 1_8");
 			return OVRP_1_8_0.ovrp_GetNodePose2(0, nodeId);
+		}
+		//Debug.Log("other Version");
 
 		return OVRP_0_1_2.ovrp_GetNodePose(nodeId);
 #endif
