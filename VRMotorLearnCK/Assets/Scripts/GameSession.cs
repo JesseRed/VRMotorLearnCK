@@ -18,6 +18,7 @@ public class GameSession : MonoBehaviour
     
     public Paradigma paradigma;
     
+    
     public Ball _currentBall;
 
     private void Awake()
@@ -57,10 +58,10 @@ public class GameSession : MonoBehaviour
 
     }
 
-    public void add_empty_Ball(float mass){
-        float t = Time.time;
-        playerData._Balls.Add(new OneBall(t, mass));
-    }
+    // public void add_empty_Ball(int ID, float radius, float mass, Vector3 grav, Vector3 force, Vector3 offset_pos, Vector3 offset_vel, Vector3 invert, Vector4 tremor){
+    //     float t = Time.time;
+    //     playerData._Balls.Add(new OneBall(t, mass));
+    // }
 
     public void set_Hit(int ID, int x){
         // if the current ball has hit the target 
@@ -69,10 +70,12 @@ public class GameSession : MonoBehaviour
         playerData.num_hits ++;
     }
 
-    public void register_new_Ball(int ID, float mass){
-        while (ID>playerData._Balls.Count-1){
-            add_empty_Ball(mass);
-        }
+    public void register_new_Ball(int ID, float radius, float mass, Vector3 grav, Vector3 force, Vector3 offset_pos, Vector3 offset_vel, Vector3 invert, Vector4 tremor){
+        float t = Time.time;
+        playerData._Balls.Add(new OneBall(ID, t, radius, mass, grav, force, offset_pos, offset_vel, invert, tremor));
+        // while (ID>playerData._Balls.Count-1){
+
+        // }
     }
     public void set_pick_up_time(int ID, float t){
         playerData._Balls[ID].pick_up_Time = t;
@@ -172,7 +175,10 @@ public class GameSession : MonoBehaviour
 
     }
 
-
+//  public void register_new_Ball(int ID, float radius, float mass, Vector3 grav, Vector3 force, Vector3 offset_pos, Vector3 offset_vel, Vector3 invert, Vector4 tremor){
+//         float t = Time.time;
+//         playerData._Balls.Add(new OneBall(ID, t, radius, mass, grav, force, offset_pos, offset_vel, invert, tremor);
+      
 
 
 [System.Serializable]
@@ -180,16 +186,33 @@ public class OneBall
 {
     public int is_Hit;
     public float creation_Time;
+    public int ID;
+    public float target_radius;
+    public Vector3 gravity;
+    public Vector3 ball_force;
+    public Vector3 offset_hand_pos;
+    public Vector3 offset_hand_vel;
+    public Vector3 hand_invertation;
+    public Vector4 hand_tremor;
     public float pick_up_Time;
     public float leave_the_Hand_Time;
     public float ball_mass;
     public List<BallPositionInfo> _BallPositionInfoList;
-    public OneBall(float t, float mass)
+    public OneBall(int _ID, float t, float radius, float mass, Vector3 grav, Vector3 force, Vector3 offset_pos, Vector3 offset_vel, Vector3 invert, Vector4 tremor)
     {
         _BallPositionInfoList = new List<BallPositionInfo>();
         is_Hit = 0;
         ball_mass = mass;
         creation_Time = t;
+        ID = _ID;
+        target_radius = radius;
+        gravity = grav;
+        ball_force = force;
+        offset_hand_pos = offset_pos;
+        offset_hand_vel = offset_vel;
+        hand_invertation = invert;
+        hand_tremor = tremor;
+
     }
     public void add_BallPostionInfo(BallPositionInfo new_BallPositionInfo)
     {
@@ -239,12 +262,16 @@ public class BallPositionInfo
 
     public float gravity_X_min;
     public float gravity_X_max;
-
     public float gravity_Y_min;
     public float gravity_Y_max;
-
     public float gravity_Z_min;
     public float gravity_Z_max;
+    public float force_X_min;
+    public float force_X_max;
+    public float force_Y_min;
+    public float force_Y_max;
+    public float force_Z_min;
+    public float force_Z_max;
     public float offset_hand_pos_X_min;
     public float offset_hand_pos_X_max;
     public float offset_hand_pos_Y_min;
@@ -257,7 +284,9 @@ public class BallPositionInfo
     public float offset_hand_vel_Y_max;
     public float offset_hand_vel_Z_min;
     public float offset_hand_vel_Z_max;
-    public float hand_invert;
+    public float hand_invert_X;
+    public float hand_invert_Y;
+    public float hand_invert_Z;
     public float hand_tremor_X;
     public float hand_tremor_Y;
     public float hand_tremor_Z;

@@ -51,20 +51,31 @@ public class Ball : MonoBehaviour
         leftHand = GameObject.Find("CustomHandLeft");
         rightHand = GameObject.Find("CustomHandRight");
         rightHand = GameObject.Find("RightHandAnchor");
-        
+        Debug.Log(rightHand.ToString());
+        //rightHand.transform = new Vector3(1.0f, -1.0f, 1.0f);
 
         rb = GetComponent<Rigidbody>(); 
         
 
         ID = myGameManager.get_current_Ball_ID();
-
+        normalize_hand_controller();
         set_target_radius();
         set_physics();
-        set_hand_controller();
+        //set_hand_controller();
         
         //Debug.Log("wall scale = " + wall.transform.localScale.x ToString());
         //TODO Die Methode muss noch angepasst werden um alle Paramter mit zu speichern
-        gameSession.register_new_Ball(ID, par_mass);
+        gameSession.register_new_Ball(
+            ID, 
+            parameter.current_target_radius,
+            parameter.current_ball_mass, 
+            parameter.current_gravity,
+            parameter.current_force,
+            parameter.current_offset_hand_pos, 
+            parameter.current_offset_hand_vel,
+            parameter.current_invert,
+            parameter.current_tremor
+            );
     }
 
     //* das Paramter Object wird durch den Gamemanager immer vor dem Spawnen 
@@ -82,7 +93,7 @@ public class Ball : MonoBehaviour
 
         par_mass = parameter.current_ball_mass;
         rb.mass = par_mass;
-        rb.useGravity = false;
+        rb.useGravity = true;
         //Debug.Log("par_mas = " + par_mas);
         par_gravity = parameter.get_gravitiy();
         Physics.gravity = par_gravity;
@@ -91,19 +102,28 @@ public class Ball : MonoBehaviour
 
     private void set_hand_controller()
     {
-        
+        Debug.Log("set Hand controller()...");
+        Debug.Log("parameter.current_offset_hand_pos = " + parameter.current_offset_hand_pos);
+        Debug.Log("parameter.current_offset_hand_vel = " + parameter.current_offset_hand_vel);
+        Debug.Log("parameter.current_invert = " + parameter.current_invert);
+        Debug.Log("parameter.current_tremor = " + parameter.current_tremor);
         OVRPlugin.carsten_offset_hand_pos = parameter.current_offset_hand_pos;
         OVRPlugin.carsten_offset_hand_vel = parameter.current_offset_hand_vel;
         OVRPlugin.carsten_invert = parameter.current_invert;
-        OVRPlugin.carsten_tremor = parameter.current_tremor;
-        
-        
-        
+        OVRPlugin.carsten_tremor = parameter.current_tremor;       
         //rightHand.transform.position = rightHand.transform.position  + parameter.current_offset_hand_pos;
         //rightHand.transform.position = rightHand.transform.position  + new Vector3(0.2f, 0.0f, 0.0f);
         Debug.Log("offset = " + parameter.current_offset_hand_pos.ToString());
         Debug.Log("transform right hand to " + rightHand.transform.position.ToString());
         
+    }
+
+    private void normalize_hand_controller()
+    {
+        OVRPlugin.carsten_offset_hand_pos = new Vector3(0.0f, 0.0f, 0.0f);
+        OVRPlugin.carsten_offset_hand_vel = new Vector3(1.0f, 1.0f, 1.0f);
+        OVRPlugin.carsten_invert = new Vector3(0.0f, 0.0f, 0.0f);;
+        OVRPlugin.carsten_tremor = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);;       
     }
 
     // Update is called once per frame
@@ -125,7 +145,10 @@ public class Ball : MonoBehaviour
             is_grabbed = true;
             gameSession.set_pick_up_time(ID, Time.time);
             ball_was_taken = true; // this is set one time and markes the start of the recording of the ball position
-            rb.useGravity = true;
+            OVRPlugin.carsten_ball_grap_position = transform.position;
+            intitialize_forces_on_ball();
+            set_hand_controller();
+            //rb.useGravity = true;
         }
         if (is_grabbed && !transform.GetComponent<OVRGrabbable>().isGrabbed){
             // The ball was grapped in the past and is now released
@@ -133,6 +156,11 @@ public class Ball : MonoBehaviour
             is_grabbed = false;
             gameSession.set_leave_the_Hand_Time(ID, Time.time);
         }
+    }
+
+    private void intitialize_forces_on_ball()
+    {
+        rb.AddForce(parameter.current_force);
     }
 
     void OnTriggerEnter(Collider other){

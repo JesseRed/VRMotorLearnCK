@@ -40,9 +40,13 @@ public static class OVRPlugin
 {
 
 	public static Vector3 carsten_offset_hand_pos;
-	public static Vector3 carsten_offset_hand_vel;
+	public static Vector3 carsten_offset_hand_vel; // = new Vector3(0.0f, );
 	public static Vector3 carsten_invert;
 	public static Vector4 carsten_tremor;
+	public static Vector3 carsten_ball_grap_position;
+	public static bool is_inverted=false;
+	public static Posef save_posef;
+	public static bool first_time_debug = true;
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
 	public const bool isSupportedPlatform = false;
 #else
@@ -2019,24 +2023,85 @@ public static class OVRPlugin
 		if (version >= OVRP_1_12_0.version){
 			//Debug.Log("version > 1_12");
 			//Debug.Log("return =" + OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose.ToString());
+			
 			Posef tmp = OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose ;
+			//Debug.Log("initialized tmp = " + tmp.Position.ToString());
+			//Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
+			
+			// wenn eine keine invertierung dann 
+			// if ((tmp.Position.x<0.00001) && (tmp.Position.x>-0.0001))
+			// {	
+			// 	//save_posef = tmp;
+			// }
+			// if (carsten_invert[0]<1.0f && carsten_invert[1]<1.0f && carsten_invert[2]<1.0f)
+			// {
+			// 	is_inverted=false;
+			// 	save_posef  = tmp;
+			// }else{
+			// 	if (is_inverted==false){
+			// 		//Debug.Log("now start to invert with last Position = " + save_posef.Position.ToString());
+			// 		//Debug.Log("now start to invert with tmp Position = " + tmp.Position.ToString());
+			// 	}
+			// 	is_inverted = true;
+			// }
+
+			// if (is_inverted){
+			// 	Debug.Log("carsten invert = " + carsten_invert.ToString());
+				//Debug.Log("In InVERTED Position save_posef = " + save_posef.Position.ToString());
+				//Debug.Log("In InVERTED Position prior to invert = " + tmp.Position.ToString());
+				// tmp.Position.x += (tmp.Position.x-save_posef.Position.x) *carsten_invert[0] *-1.0f;
+				// tmp.Position.y += (tmp.Position.y-save_posef.Position.y) *carsten_invert[1];
+				// tmp.Position.z += (tmp.Position.z-save_posef.Position.z) *carsten_invert[2];
+				//tmp.Position.x = (tmp.Position.x-save_posef.Position.x) *-1.0f;
+				//tmp.Position.x = (tmp.Position.x-0.17f) *-1.0f;
+			if (carsten_invert[0]>0.1f){
+				//tmp.Position.x = (tmp.Position.x) *carsten_invert[0]*-1.0f +0.31f;
+
+				tmp.Position.x = (tmp.Position.x) *carsten_invert[0]*-1.0f ;
+			}
+			if (carsten_invert[1]>0.1f){
+				tmp.Position.y = (tmp.Position.y) *carsten_invert[1]*-1.0f -0.4f;
+			}
+			if (carsten_invert[2]>0.1f){
+				//tmp.Position.z = (tmp.Position.z) *carsten_invert[2]*-1.0f -0.6f;
+				tmp.Position.z = (tmp.Position.z) *carsten_invert[2]*-1.0f -0.6f ;
+			}
+				
+			if (first_time_debug && carsten_invert[0]>0.1f){
+					Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
+					Debug.Log("In InVERTED Position after to invert = " + tmp.Position.ToString());
+					first_time_debug=false;
+			}
+				
+				// tmp.Position.y = (tmp.Position.y) *carsten_invert[1] -0.2f;
+				// tmp.Position.z = (tmp.Position.z) *carsten_invert[2] -0.6f;
+				//Debug.Log("In InVERTED Position after to invert = " + tmp.Position.ToString());
+				//Application.Quit();
+			//}
+			//Debug.Log("tmp Position prior to carsten_offset_hand_pos = " + tmp.Position.ToString());
 			tmp.Position.x += carsten_offset_hand_pos[0];
 			tmp.Position.y += carsten_offset_hand_pos[1];
 			tmp.Position.z += carsten_offset_hand_pos[2];
-			tmp.Position.x *= carsten_offset_hand_vel[0];
+			tmp.Position.x *= carsten_offset_hand_vel[0];// - 0.2f *carsten_offset_hand_vel[0];
 			tmp.Position.y *= carsten_offset_hand_vel[1];
 			tmp.Position.z *= carsten_offset_hand_vel[2];
+			//Debug.Log("tmp Position after to carsten_offset_hand_vel = " + tmp.Position.ToString());
 
-			tmp.Position.x *= carsten_invert[0];
-			tmp.Position.y *= carsten_invert[1];
-			tmp.Position.z *= carsten_invert[2];
+
+
 
 			// Tremor
-			tmp.Position.x *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[0]/10*-1.0f);
-			tmp.Position.y *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[1]/10*-1.0f);
-			tmp.Position.z *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[2]/10*-1.0f);
-	
+			if (carsten_tremor[0]>0){
 			
+				tmp.Position.x *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[0]/10*-1.0f);
+			}
+			if (carsten_tremor[1]>0){
+				tmp.Position.y *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[1]/10*-1.0f);
+			}
+			if (carsten_tremor[2]>0){
+				tmp.Position.z *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[2]/10*-1.0f);				
+			}
+			//Debug.Log("return tmp = " + tmp.Position.ToString());
 			return tmp;
 //			return OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose ;
 		}
