@@ -20,10 +20,12 @@ public class Spawner : MonoBehaviour {
  //   public MyGameManager myGameManager;
     //public List<BallInfo> _BallInfos = new List<BallInfo>();
     // public MyBallCollection myBallCollection = new MyBallCollection();
-
+    private bool first_ball;
     void Start()
     {
+        first_ball = true;
 //        myGameManager = FindObjectOfType<MyGameManager>();
+
     }
 
 
@@ -34,32 +36,36 @@ public class Spawner : MonoBehaviour {
         // und dieser sollte gezeichnet werden
         Vector3 spawnPosition = GetSpawnPosition ();
         
-        Quaternion spawnRotation = new Quaternion ();
-        spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);
-        //Quaternion spawnRotation = new Quaternion ();
-
-        Instantiate (ball, spawnPosition, spawnRotation);
+        float sec=2.0f; 
+        if (first_ball) {
+            sec =0.1f;
+            first_ball = false;
+        }
+        StartCoroutine(InstantiateNow(spawnPosition, sec));
+        
          
     }
 
     Vector3 GetSpawnPosition () {
         Vector3 spawnPosition = new Vector3 ();
-        spawnPosition = new Vector3(0.217f, 1.068f, 0.53f);
-        spawnPosition = new Vector3(0.0f, 0.534f, 0.0f);
-        spawnPosition = new Vector3(0.0f, -0.951f, -2.65f);
+        //spawnPosition = new Vector3(0.217f, 1.068f, 0.53f);
+        //spawnPosition = new Vector3(0.0f, 0.534f, 0.0f);
+        //spawnPosition = new Vector3(0.0f, -0.951f, -2.65f);
+        spawnPosition = new Vector3(0.0f, 0.6f, -2.65f);
 
-        // Vector3 spawnPosition = new Vector3 ();
-        // float startTime = Time.realtimeSinceStartup;
-        // bool test = false;
-        // while (test == false) {
-        //     Vector2 spawnPositionRaw = Random.insideUnitCircle * spawnSize;
-        //     spawnPosition = new Vector3 (spawnPositionRaw.x, minionOffset, spawnPositionRaw.y);
-        //     test = !Physics.CheckSphere (spawnPosition, 0.75f);
-        //     if (Time.realtimeSinceStartup - startTime > 0.5f) {
-        //         Debug.Log ("Time out placing Minion!");
-        //         return Vector3.zero;
-        //     }
-        // }
         return spawnPosition;
+    }        
+
+
+    IEnumerator  InstantiateNow(Vector3 spawnPosition, float sec) 
+    {
+        yield return new WaitForSeconds (sec);
+        Quaternion spawnRotation = new Quaternion ();
+        spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);
+
+        Instantiate (ball, spawnPosition, spawnRotation);
     }
+
+
+
 }
