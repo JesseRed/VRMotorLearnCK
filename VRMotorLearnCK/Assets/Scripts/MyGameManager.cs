@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
@@ -164,7 +164,9 @@ public class MyGameManager : MonoBehaviour
     IEnumerator CompensateHeadPosition()
     {
         yield return new WaitForSeconds(2.0f);
-        //ovrPlayerController.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+        //ovrPlayerController.transform.position = new Vector3(0.0f, 0.0f, -2.7f);
+        //yield return new WaitForSeconds(2.0f);
+        //ovrPlayerController.transform.position = new Vector3(0.0f, 0.0f, -1.7f);
         // yield return new WaitForSeconds(2.0f);
         // ovrCameraRig.transform.position = new Vector3(0.0f, 0.0f, 0.00200245f);
         // yield return new WaitForSeconds(2.0f);
