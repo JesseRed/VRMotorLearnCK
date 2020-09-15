@@ -51,7 +51,7 @@ public class Spawner : MonoBehaviour {
         //spawnPosition = new Vector3(0.217f, 1.068f, 0.53f);
         //spawnPosition = new Vector3(0.0f, 0.534f, 0.0f);
         //spawnPosition = new Vector3(0.0f, -0.951f, -2.65f);
-        spawnPosition = new Vector3(0.0f, 0.6f, -2.65f);
+        spawnPosition = new Vector3(0.0f, 0.0f, -2.65f);
 
         return spawnPosition;
     }        
