@@ -41,41 +41,42 @@ public class Spawner : MonoBehaviour {
         
         float sec=2.0f; 
         if (first_ball) {
-            sec =0.1f;
+            //sec =0.1f;
             first_ball = false;
         }
         // StartCoroutine(InstantiateNow(spawnPosition, sec));
         Quaternion spawnRotation = new Quaternion ();
         spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);
         
-        GameObject myball = Instantiate (ball, spawnPosition, spawnRotation) as GameObject;
-
-        StartCoroutine(MoveTheBall(ball, spawnPosition, 5.0f));
+        // GameObject myball = Instantiate (ball, spawnPosition, spawnRotation) as GameObject;
+        // myball.set_bounding_box(playarea_min, playarea_max);
+        //         playBall.start_moving();
+        // // StartCoroutine(MoveTheBall(ball, spawnPosition, 5.0f));
     }
 
 
-    IEnumerator  MoveTheBall(GameObject ball, Vector3 spawnPosition, float timeLeft) 
-    {
+    // IEnumerator  MoveTheBall(GameObject ball, Vector3 spawnPosition, float timeLeft) 
+    // {
         
-        Debug.Log("move  the Ball from Spawner start position =" + spawnPosition);
+    //     Debug.Log("move  the Ball from Spawner start position =" + spawnPosition);
         
-        // Quaternion spawnRotation = new Quaternion ();
-        // spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);
-        while (timeLeft >= 0.0f) {
-            // while (isPaused) {
-                yield return new WaitForEndOfFrame ();
-            // }
+    //     // Quaternion spawnRotation = new Quaternion ();
+    //     // spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);
+    //     while (timeLeft >= 0.0f) {
+    //         // while (isPaused) {
+    //             yield return new WaitForEndOfFrame ();
+    //         // }
 
-           timeLeft -= Time.deltaTime;
-           Vector3 newPosition = ball.transform.position;
-           newPosition.x += 0.1f;
-           ball.transform.position = newPosition ;
-        //  Debug.Log (timeLeft);
-          //new WaitForSeconds (0.01f);
-        }
-        yield return null;
-    }
-        // Instantiate (ball, spawnPosition, spawnRotation);
+    //        timeLeft -= Time.deltaTime;
+    //        Vector3 newPosition = ball.transform.position;
+    //        newPosition.x += 0.1f;
+    //        ball.transform.position = newPosition ;
+    //     //  Debug.Log (timeLeft);
+    //       //new WaitForSeconds (0.01f);
+    //     }
+    //     yield return null;
+    // }
+    //     // Instantiate (ball, spawnPosition, spawnRotation);
     
 
     Vector3 GetSpawnPosition () {

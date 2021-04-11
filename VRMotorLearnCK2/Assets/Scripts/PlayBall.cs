@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,9 +20,10 @@ public class PlayBall : MonoBehaviour {
 	public float alpha = 0.5f;
     // Start is called before the first frame update
     int idx = 0;
-
-    private GameObject leftHand, rightHand;
+   // public Paradigma paradigma;
+    private GameObject leftHand, rightHand, rightEye;
     private LineRenderer myline;
+    private float time_ball_active = 0.0f;
     public float currentFingerBallDist;
     public bool is_waitForStart = false;
     public bool is_stopped = true;
@@ -29,19 +31,35 @@ public class PlayBall : MonoBehaviour {
     public MyGameManager myGameManager;
     public GameSession gameSession;
     private int ID;
+    private float ball_size;
+    private float ball_vel;
+    private float time_start_moving;
+    public Parameter parameter;
+    private Vector3 playarea_center; 
+    private float ball_duration;
     // es wird hier nicht immer ein neuer Ball gespawned sondern wir
     // verwenden hier den gleichen Ball
-    void Start(){
 
+    void Awake(){
+        Debug.Log("Awake PlayBall");
          Application.targetFrameRate = 60;
         //rightHand = GameObject.Find("RightHandAnchor");
         myGameManager = FindObjectOfType<MyGameManager>();
         gameSession = FindObjectOfType<GameSession>();
+        parameter = FindObjectOfType<Parameter>();
         rightHand = GameObject.Find("hands:b_r_index_ignore");
         
-        float xh = rightHand.transform.position.x;
-        float yh = rightHand.transform.position.y;
-        float zh = rightHand.transform.position.z;
+        ID = parameter.current_ball_ID;
+        // registriere den Ball ... this adds the ball by ID to the playerData
+        gameSession.register_new_Ball(ID);
+        rightEye = GameObject.Find("RightEyeAnchor");
+        // die Bounding Box wird bei jedem Ball neu gesetzt falls der Player sich mit der Zeit 
+        // anders setzt
+        set_current_playarea_and_object_transform();
+        
+        
+                
+                
         // setting the playarea in which the object travels
         // Vector3 min = new Vector3(0.0f, -1.0f, 0.2f);
         // Vector3 max = new Vector3(0.2f, -0.5f, 0.5f);
@@ -53,20 +71,58 @@ public class PlayBall : MonoBehaviour {
         myline.SetWidth(0.0005f, 0.0005f);
         //myline.SetPosition(0,min);
         //myline.SetPosition(0,max);
-        is_waitForStart = false;
-        is_stopped = true;
-        is_active = false;
+        ball_size = gameSession.paradigma.ball_size_max;
+        ball_vel = gameSession.paradigma.ball_veloc_max;
+        ball_duration = gameSession.paradigma.ball_duration;
+        Debug.Log("PlayBall:Awake:ball_duration = "+ ball_duration);
+        transform.localScale = new Vector3(ball_size, ball_size, ball_size);
+        waitForStart();
+    }
+    void Start(){
+        Debug.Log("STart PlayBall");
+        
+    }
+
+    void set_current_playarea_and_object_transform(){
+        // float xh = rightHand.transform.position.x;
+        // float yh = rightHand.transform.position.y;
+        // float zh = rightHand.transform.position.z;
+        // float xe = rightEye.transform.position.x;
+        // float ye = rightEye.transform.position.y;
+        // float ze = rightEye.transform.position.z; 
+
+        // playarea_min[0] = rightEye.transform.position.x-0.2f;
+        // playarea_min[1] = rightEye.transform.position.y-0.3f;
+        // playarea_min[2] = rightEye.transform.position.z+0.15f;
+        // playarea_max[0] = rightEye.transform.position.x+0.2f;
+        // playarea_max[1] = rightEye.transform.position.y-0.1f;
+        // playarea_max[2] = rightEye.transform.position.z+0.4f;
+
+        playarea_min[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_min_x;
+        playarea_min[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_min_y;
+        playarea_min[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_min_z;
+        playarea_max[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_max_x;
+        playarea_max[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_max_y;
+        playarea_max[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_max_z;
+        playarea_center = (playarea_min+playarea_max)/2.0f;
+        transform.position = playarea_center;
     }
 
 	void Update()
 	{
+
         currentFingerBallDist = Vector3.Distance(rightHand.transform.position, transform.position);
         myline.SetPosition(0, rightHand.transform.position);
         myline.SetPosition(1, transform.position);
         // waiting that the finger comes near
-        if (is_waitForStart){
+        if (is_waitForStart) {
             //Debug.Log("Catmul:Update is_waitForStart() with currentFingerBallDist = " + currentFingerBallDist);
             if (currentFingerBallDist<0.01f){
+                // ####################
+                // Der start des Balls
+                // setze die Startzeit des Balls
+                time_start_moving = Time.time;
+                Debug.Log("time_start_moving = " + time_start_moving);
                 is_waitForStart = false;
                 is_stopped = false;
                 is_active = true;
@@ -85,8 +141,14 @@ public class PlayBall : MonoBehaviour {
                 CatmulRom(waypointList, 0.1f);
             }
             // hier sollten noch andere Parameter
-            gameSession.add_Ball_Hand_Position(ID, transform.position, rightHand.transform.position, Time.time);
-
+            time_ball_active = Time.time-time_start_moving;
+            //Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
+            gameSession.add_Ball_Hand_Position(ID, transform.position, rightHand.transform.position, Time.time, time_ball_active);
+            parameter.push_infos(currentFingerBallDist);
+            if ( time_ball_active>ball_duration){
+                Debug.Log("time_ball_active>ball_duration");
+                 StartCoroutine(save_and_destroy());
+            }
         }
 	}
 
@@ -108,13 +170,27 @@ public class PlayBall : MonoBehaviour {
         Debug.Log("Catmul:stop_moving()");
         is_stopped = true;
         is_active = false;
-
     }
 
-    public void set_bounding_box(Vector3 min, Vector3 max){
-        playarea_min = min;
-        playarea_max = max;
+    IEnumerator save_and_destroy(){
+        Debug.Log("PlayBall:save_and_destroy()");
+        is_stopped = true;
+        is_active = false;
+        gameSession.SaveIntoJson();
+        yield return new WaitForSeconds(1.5f);
+        Debug.Log("PlayBall:save_and_destroy: Now Destroy ball Nr " + ID);
+        Destroy(gameObject);
     }
+
+    public float get_time_ball_active(){
+        return time_ball_active;
+    }
+
+
+    // public void set_bounding_box(Vector3 min, Vector3 max){
+    //     playarea_min = min;
+    //     playarea_max = max;
+    // }
     void addwaypoint(Vector3 min, Vector3 max){
             if (waypointList.Count==0){
                 waypointList.Add(transform.position);
@@ -166,6 +242,14 @@ public class PlayBall : MonoBehaviour {
 	    return (b + t);
 	}
 	
+    // public void initialize_new_ball(int newID){
+    //     set_ID(newID);
+    //     ball_size = gameSession.paradigma.ball_size_max;
+    //     ball_vel = gameSession.paradigma.ball_veloc_max;
+    //     ball_duration = gameSession.paradigma.ball_duration;
+    //     transform.localScale = new Vector3(ball_size, ball_size, ball_size);
+               
+    // }
     public void set_ID(int newID){
         ID = newID;
     }

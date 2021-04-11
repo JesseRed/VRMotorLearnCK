@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//using System;
+using TMPro;
 
 public class Parameter : MonoBehaviour
 {
     public GameSession gameSession;
-    public LineObj lineObj;
-    public Paradigma paradigma;
+
     public MyGameManager myGameManager;
     public PlayBall playBall;
     //public OVREye 
@@ -19,17 +20,7 @@ public class Parameter : MonoBehaviour
     public Vector3 playarea_max;
     public Vector3 playarea_center;
     
-    private Vector3[] playareaSelector_vertices;
-    private Mesh playareaSelector_mesh;
     
-    public GameObject playareaSelector;
-    
-    public GameObject playareaMarkerXmin;
-    public GameObject playareaMarkerXmax;
-    public GameObject playareaMarkerYmin;
-    public GameObject playareaMarkerYmax;
-    public GameObject playareaMarkerZmin;
-    public GameObject playareaMarkerZmax;
     //private GameObject playBall;
 
     //scaling difficulty ... each offset scales with this factor
@@ -65,17 +56,25 @@ public class Parameter : MonoBehaviour
     public Vector3 difficulty_invert =          new Vector3(7.0f, 7.0f, 9.0f);
     public Vector4 difficulty_tremor =          new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
     public bool isdebug = true;
-    private GameObject leftHand, rightHand;
+    private GameObject leftHand, rightHand, rightEye;
     public GameObject mycenterEyeAnchor;
+    public int current_ball_ID;
     public bool is_playarea_initialized = false;
     public bool is_in_initializing_process = false;
+
+    public int punkteBlock =0;
+    public int punkteGesamt =0;
+    //public GameObject anzeigeText;
+    public GameObject anzeigeTextBlock;
+    public GameObject anzeigeTextPunkteBlock;
+    public GameObject anzeigeTextPunkteGesamt;
     // Start is called before the first frame update
 
     void Start()
     {
         Debug.Log("Parameter:Start()");
         //playBall = GameObject.Find("Catmul");
-        playBall = FindObjectOfType<PlayBall>();
+        //playBall = FindObjectOfType<PlayBall>();
         gameSession = FindObjectOfType<GameSession>();
 //        lineObj = FindObjectOfType<LineObj>(); // Zeichnet den Zielkreis auf die Wand
         myGameManager = FindObjectOfType<MyGameManager>();
@@ -83,25 +82,35 @@ public class Parameter : MonoBehaviour
   //      rightHand = GameObject.Find("CustomHandRight");
         leftHand = GameObject.Find("LeftHandAnchor");
         rightHand = GameObject.Find("RightHandAnchor");
+        rightEye = GameObject.Find("RightEyeAnchor");
+        //anzeigeTextPunkteBlock = GameObject.Find("AnzeigeTextPunkteBlock");
+        //anzeigeTextPunkteGesamt = GameObject.Find("AnzeigeTextPunkteGesamt");
+      
+        // float xh = rightHand.transform.position.x;
+        // float yh = rightHand.transform.position.y;
+        // float zh = rightHand.transform.position.z;
         
-        float xh = rightHand.transform.position.x;
-        float yh = rightHand.transform.position.y;
-        float zh = rightHand.transform.position.z;
+        // float xe = rightEye.transform.position.x;
+        // float ye = rightEye.transform.position.y;
+        // float ze = rightEye.transform.position.z;
         
-        
-        playarea_min = new Vector3(xh, yh, zh);
-        playarea_max = new Vector3(xh, yh, zh);
-        playareaMarkerXmin.transform.position = new Vector3(xh-0.1f,yh,zh);
-        playareaMarkerXmax.transform.position = new Vector3(xh+0.1f,yh,zh);
-        playareaMarkerYmin.transform.position = new Vector3(xh,yh-0.1f,zh);
-        playareaMarkerYmax.transform.position = new Vector3(xh,yh+0.1f,zh);
-        playareaMarkerZmin.transform.position = new Vector3(xh,yh,zh-0.1f);
-        playareaMarkerZmax.transform.position = new Vector3(xh,yh,zh+0.1f);
+        // // offset of bounding box in relation to the head of the player
+        // float xoffset = 0.0f;
+        // float yoffset = -0.2f;
+        // float zoffset = 0.2f;
 
-        playareaSelector_vertices = playareaSelector.GetComponent<MeshFilter>().mesh.vertices;
-        playareaSelector.transform.position = new Vector3(xh-4.0f , yh , zh );
-        playareaSelector_mesh = playareaSelector.GetComponent<MeshFilter>().mesh;
-        playareaSelector_vertices = playareaSelector_mesh.vertices;
+        // xh = xe+xoffset;
+        // yh = ye+yoffset;
+        // zh = ze+zoffset;
+
+        
+        //Debug.Log("rightHand.transform.position = " + xh + " " + yh + " "+ zh);
+        //Debug.Log("rightEye.transform.position = " + xe + " " + ye + " "+ ze);
+        
+
+        // playarea_min = new Vector3(xh, yh, zh);
+        // playarea_max = new Vector3(xh, yh, zh);
+
 
         current_target_radius = gameSession.paradigma.target_size;
         current_ball_mass = gameSession.paradigma.ball_mass;
@@ -111,121 +120,55 @@ public class Parameter : MonoBehaviour
         current_offset_hand_vel = initialize_offset_hand_vel();
         current_invert = new Vector3(1.0f, 1.0f, 1.0f);
         current_tremor = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
-        UpdateAnchors();
+        //UpdateAnchors();
+    }
+
+    public void push_infos(float currentFingerBallDist){
+//        Debug.Log("currentFingerBallDist =  " + currentFingerBallDist);
+        // ich berechne die Punkte in Relation zur Laenge der imaginaeren Box in der der Ball fliegt
+        float laenge =  Mathf.Abs(gameSession.paradigma.playarea_max_x - gameSession.paradigma.playarea_min_x)/2.0f;
+        // wenn der Abstand groesser ist gibt es 0 Punkte 
+        // ab dort wird der Abstand halbiert und bei jeder halbierung gibt es einen Punkt mehr (10 Schritte)
+        // wie oft (x) muss ich laenge halbieren um eine Zahl kleiner als currentFingerBallDist zu erhalten
+        // laenge/(2`x)= currentFingerBallDist
+        // laenge = currentFingerBallDist * 2^x
+        // (laenge/currentFingerBallDist) =  2^x
+        // x = log(laenge/currentFingerBallDist) zur Basis 2
+        int punkteAdd =  Mathf.RoundToInt(Mathf.Log((laenge / currentFingerBallDist),2));
+        if (punkteAdd>10){ punkteAdd = 10; }
+        if (punkteAdd <0){ punkteAdd = 0;  }
+        //Debug.Log("estimated Add Punkte="+punkteAdd  + " (  currentFingerBallDist =  " + currentFingerBallDist +")" );
+        punkteBlock += punkteAdd;
+        punkteGesamt+= punkteAdd;
+        anzeigeTextPunkteBlock.GetComponent<TextMeshPro>().SetText(punkteBlock.ToString());
+        anzeigeTextPunkteGesamt.GetComponent<TextMeshPro>().SetText(punkteGesamt.ToString());
+
     }
 
     void Update(){
-        Debug.Log("Parameter:Update()");
-    if (! is_playarea_initialized){
-            float xh = rightHand.transform.position.x;
-            float yh = rightHand.transform.position.y;
-            float zh = rightHand.transform.position.z;
-            playarea_min[0] = playareaMarkerXmin.transform.position.x;
-            playarea_min[1] = playareaMarkerYmin.transform.position.y;
-            playarea_min[2] = playareaMarkerZmin.transform.position.z;
-            playarea_max[0] = playareaMarkerXmax.transform.position.x;
-            playarea_max[1] = playareaMarkerYmax.transform.position.y;
-            playarea_max[2] = playareaMarkerZmax.transform.position.z;
-            
-            if (OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger, OVRInput.Controller.RTouch)>0){
-                Debug.Log("OVRInput SecondaryHandTrigger = " + OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger, OVRInput.Controller.RTouch));
-            }
-            if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.RTouch)>0){
-                Debug.Log("OVRInput PrimaryHandTrigger = " + OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, OVRInput.Controller.RTouch));
-            }
-            if (OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, OVRInput.Controller.RTouch)>0){
-                Debug.Log("Parameter:Update()");
-                StartCoroutine(UpdatePlayarea2());
-            }
-            // Button.One -> initialize the setup box
-            if (OVRInput.Get(OVRInput.Button.One, OVRInput.Controller.RTouch) && !is_in_initializing_process){
-                is_in_initializing_process = true;
-                playBall.stop_moving();
-                playareaMarkerXmin.transform.position = new Vector3(xh-0.1f,yh,zh);
-                playareaMarkerXmax.transform.position = new Vector3(xh+0.1f,yh,zh);
-                playareaMarkerYmin.transform.position = new Vector3(xh,yh-0.1f,zh);
-                playareaMarkerYmax.transform.position = new Vector3(xh,yh+0.1f,zh);
-                playareaMarkerZmin.transform.position = new Vector3(xh,yh,zh-0.1f);
-                playareaMarkerZmax.transform.position = new Vector3(xh,yh,zh+0.1f);
-                StartCoroutine(UpdatePlayarea2());
-                //Debug.Log("OVRInput.Button.One = " + OVRInput.Get(OVRInput.Button.One, OVRInput.Controller.RTouch));
-            }
 
-            if (OVRInput.Get(OVRInput.Button.Two, OVRInput.Controller.RTouch) && is_in_initializing_process){
-                is_playarea_initialized = true;
-                is_in_initializing_process = false;
-                // mache die ziehkugeln unsichtbar
-                playareaMarkerXmin.transform.position = new Vector3(xh-0.1f,yh,zh);
-                playareaMarkerXmin.GetComponent<Renderer>().enabled = false;
-                playareaMarkerXmax.GetComponent<Renderer>().enabled = false;
-                playareaMarkerYmin.GetComponent<Renderer>().enabled = false;
-                playareaMarkerYmax.GetComponent<Renderer>().enabled = false;
-                playareaMarkerZmin.GetComponent<Renderer>().enabled = false;
-                playareaMarkerZmax.GetComponent<Renderer>().enabled = false;                
-                // initialize playball position in the middle of cube
-                //playBall.transform.position = new Vector3(playarea_center[0], playarea_center[1], playarea_center[2]);
-                // playBall.set_bounding_box(playarea_min, playarea_max);
-                // playBall.start_moving();
-            }
+//         if (! is_playarea_initialized){
 
-        }    
-    
-    }
-
-    IEnumerator  UpdatePlayarea2() 
-    {
-        set_cube_vertices4(playarea_min, playarea_max);
-        yield return null;
-       
-    }
-
-private void set_cube_vertices4(Vector3 imin, Vector3 imax){
-        
-        playarea_center = (imin+imax)/2.0f;
-        float x_min = imin[0]-playarea_center[0];
-        float x_max = imax[0]-playarea_center[0];
-        float y_min = imin[1]-playarea_center[1];
-        float y_max = imax[1]-playarea_center[1];
-        float z_min = imin[2]-playarea_center[2];
-        float z_max = imax[2]-playarea_center[2];
-        // Debug.LogWarning("set_cube_verices hand x_min="+ x_min + "y_min="+y_min + " z_min=" + z_min);
-        // Debug.Log("set_cube_verices hand y_max="+ y_max + "y_min="+y_min);
-        // Debug.Log("set_cube_verices trans x_min=" + x_min + "x_max=" + x_max);
-        // Debug.Log("set_cube_verices trans y_min=" + y_min + "y_max=" + y_max);
-        playareaSelector.transform.position = playarea_center;
-        
-        //back
-        playareaSelector_vertices[0]= new Vector3(x_max, y_min, z_max);
-        playareaSelector_vertices[1]= new Vector3(x_min, y_min, z_max);
-        playareaSelector_vertices[2]= new Vector3(x_max, y_max, z_max);
-        playareaSelector_vertices[3]= new Vector3(x_min, y_max, z_max);
-        //front
-        playareaSelector_vertices[4]= new Vector3(x_max, y_max, z_min);
-        playareaSelector_vertices[5]= new Vector3(x_min, y_max, z_min);
-        playareaSelector_vertices[6]= new Vector3(x_max, y_min, z_min);
-        playareaSelector_vertices[7]= new Vector3(x_min, y_min, z_min);
-        // oben
-        playareaSelector_vertices[8]= new Vector3(x_max, y_max, z_max);
-        playareaSelector_vertices[9]= new Vector3(x_min, y_max, z_max);
-        playareaSelector_vertices[10]= new Vector3(x_max, y_max, z_min);
-        playareaSelector_vertices[11]= new Vector3(x_min, y_max, z_min);
-        // unten 
-        playareaSelector_vertices[12]= new Vector3(x_max, y_min, z_min);
-        playareaSelector_vertices[13]= new Vector3(x_max, y_min, z_max);
-        playareaSelector_vertices[14]= new Vector3(x_min, y_min, z_max);
-        playareaSelector_vertices[15]= new Vector3(x_min, y_min, z_min);
-        // links
-        playareaSelector_vertices[16]= new Vector3(x_min, y_min, z_max);
-        playareaSelector_vertices[17]= new Vector3(x_min, y_max, z_max);
-        playareaSelector_vertices[18]= new Vector3(x_min, y_max, z_min);
-        playareaSelector_vertices[19]= new Vector3(x_min, y_min, z_min);
-        // rechts
-        playareaSelector_vertices[20]= new Vector3(x_max, y_min, z_min);
-        playareaSelector_vertices[21]= new Vector3(x_max, y_max, z_min);
-        playareaSelector_vertices[22]= new Vector3(x_max, y_max, z_max);
-        playareaSelector_vertices[23]= new Vector3(x_max, y_min, z_max);
-
-        playareaSelector_mesh.vertices = playareaSelector_vertices;
+// //            if (OVRInput.Get(OVRInput.Button.One, OVRInput.Controller.RTouch)){
+//             if (OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger, OVRInput.Controller.RTouch)>0){
+//                 float xe = rightEye.transform.position.x;
+//                 float ye = rightEye.transform.position.y;
+//                 float ze = rightEye.transform.position.z; 
+//                 playBall.stop_moving(); 
+//                 playarea_min[0] = xe-0.2f;
+//                 playarea_min[1] = ye-0.3f;
+//                 playarea_min[2] = ze+0.15f;
+//                 playarea_max[0] = xe+0.2f;
+//                 playarea_max[1] = ye-0.1f;
+//                 playarea_max[2] = ze+0.4f;
+//                 playarea_center = (playarea_min+playarea_max)/2.0f;
+//                 is_playarea_initialized = true;
+//                 is_in_initializing_process = false;  
+// //                string mytext = anzeigeText.GetComponent<TextMeshPro>().text;
+//           //      Debug.Log("mytext = "+ mytext);
+//                 anzeigeText.GetComponent<TextMeshPro>().SetText("Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
+//             }
+//         }
     }
 
     // Update is called once per frame
@@ -246,11 +189,20 @@ private void set_cube_vertices4(Vector3 imin, Vector3 imax){
         // leftEyeAnchor.localScale = new Vector3 (1, -1, 1);
         }
     
-    public void set_bounding_box_to_play(){
+    // public void set_bounding_box_to_play(){
+    //     Debug.Log("set_bounding_box_to_play()");
+    //     is_playarea_initialized = false;
+    // }
 
-        is_playarea_initialized = false;
+    public void prepare_parameter_for_next_ball(int _ID){
+        Debug.Log("prepare_parameter_for_next_ball by ID="+_ID);
+
+        current_ball_ID = _ID;
+        int block_nr = current_ball_ID + 1;
+        anzeigeTextBlock.GetComponent<TextMeshPro>().SetText(block_nr.ToString());
+       
+        punkteBlock = 0;
     }
-
     public void adaptHand(){
                //rightHandAnchor.Position = 
         // current_general_difficulty = estimate_current_general_difficulty();

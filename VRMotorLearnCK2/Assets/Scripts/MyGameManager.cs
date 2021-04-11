@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEngine.EventSystems;
-
+using TMPro;
 public class MyGameManager : MonoBehaviour
 {
         // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
-    public PlayBall playBall;
+    public GameObject playBallPrefab;
+    private GameObject cloneplayBall;
 
     public static int numActiveBalls;
     private OVRPlayerController ovrPlayerController;
@@ -16,15 +17,18 @@ public class MyGameManager : MonoBehaviour
     public string dataFolderName = Path.Combine(Application.streamingAssetsPath, "Data"); 
     public string datafilename = "tmpsave.json";
     //public PlayerData playerData;
-    public LineObj lineObj;
+
+    // has to be -1 do not change 
     private int current_ball_id = -1;
 
     //public float current_target_radius = 0.2f;
     private OVRCameraRig ovrCameraRig;
-    private Spawner spawner;
+    //private Spawner spawner;
     //public GameObject wall;
     public GameSession gameSession;
     public Parameter parameter;
+    public Paradigma paradigma;
+    public GameObject anzeigeText;
     //public Catmul playBall;
     public bool is_game_active = true;
 
@@ -35,7 +39,7 @@ public class MyGameManager : MonoBehaviour
         gameSession = FindObjectOfType<GameSession>();
         parameter = FindObjectOfType<Parameter>();
         Physics.gravity = new Vector3(0.0f, -9.81f , 0.0f);
-        playBall = FindObjectOfType<PlayBall>();
+        //playBall = FindObjectOfType<PlayBall>();
     }
 
 
@@ -71,9 +75,11 @@ public class MyGameManager : MonoBehaviour
        
         //StartCoroutine (CompensateHeadPosition());
         parameter.adaptHand();
-        parameter.set_bounding_box_to_play();
+        //parameter.set_bounding_box_to_play();
         //SpawnNewBall();
 
+        anzeigeText.GetComponent<TextMeshPro>().SetText("!!Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
+  
         StartCoroutine(spawnmanagement());
         
         
@@ -89,19 +95,39 @@ public class MyGameManager : MonoBehaviour
 
     IEnumerator spawnmanagement()
     {
-        while (is_game_active){
+        while (is_game_active ){
         // 1. das Playfield muss initialisiert sein 
         // 2. es darf aktuell keinen activen Ball geben
         // 3. dann wird ein neuer Ball reseted und mit einer neuen Id versehen 
         //    und bei der GameSession registriert
-        if (parameter.is_playarea_initialized){
-            Debug.Log("MyGameManager:spawnmanagement parameter.is_playarea_initialized ... now SpawnNewBall");
-            if (!playBall.is_active){
-                Debug.Log("MyGameManager:spawnmanagement playBall.is_active = "+ playBall.is_active);
-                SpawnNewBall();
+        //if (parameter.is_playarea_initialized){
+        //    Debug.Log("MyGameManager:spawnmanagement parameter.is_playarea_initialized ... now SpawnNewBall");
+            if (cloneplayBall) { 
+                Debug.Log("MyGameManager:spawnmanagmement: cloneplayBall exists");
+                anzeigeText.GetComponent<TextMeshPro>().SetText("cloneplayBAll Versuchen sie mit dem Zeigefinger \nimmmer im Kontakt mit dem Ball zu bleiben");
+                    
+                yield return new WaitForSeconds(2.0f);
             }
-        }
-        yield return new WaitForSeconds(1.0f);
+            if (! cloneplayBall) {
+                current_ball_id += 1;
+                if (current_ball_id>=gameSession.paradigma.numBalls){
+                    anzeigeText.GetComponent<TextMeshPro>().SetText("Das Spiel ist vorbei! \n Sie können nun das HeadSet absetzen!");
+                    yield break;
+                }
+                Debug.Log("MyGameManager:spawnmanagmement: no cloneplayBall -> instantiate new one");
+                yield return new WaitForSeconds(1.0f);
+
+                parameter.prepare_parameter_for_next_ball(current_ball_id);
+                SpawnNewBall();
+                 Debug.Log("spqwnmanagement: after Instantiate");
+            }
+            // if (!playBall.is_active){
+            //     Debug.Log("MyGameManager:spawnmanagement playBall.is_active = "+ playBall.is_active);
+            //     SpawnNewBall();
+            // }
+        
+        
+            yield return new WaitForSeconds(1.0f);
         
         }
         // // StartCoroutine(MoveTheBall(ball, spawnPosition, 5.0f));
@@ -110,19 +136,15 @@ public class MyGameManager : MonoBehaviour
 
     public void SpawnNewBall()
     {
-        current_ball_id += 1;
-        playBall.set_ID(current_ball_id);
-        gameSession.register_new_Ball(current_ball_id);
-  //      parameter.configureParameterForNextBall();
+        
         Debug.Log("spawn a new Ball Nr = " + current_ball_id);
         Quaternion spawnRotation = new Quaternion ();
-        spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);
-        //Catmul myball = Instantiate (playBall, parameter.playarea_center, spawnRotation) as Catmul;
-        playBall.transform.position = parameter.playarea_center;
-        playBall.set_bounding_box(parameter.playarea_min, parameter.playarea_max);
-        playBall.waitForStart();//start_moving();
-        
-//        spawner.Spawn_A_NewBall();
+        Debug.Log("after Quaternion");
+        spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);        
+        Debug.Log("after spawnRotatino");
+        cloneplayBall = Instantiate (playBallPrefab, parameter.playarea_center, spawnRotation);
+        Debug.Log("SpawnNewBall: after after Instantiate");
+
        
     }
 

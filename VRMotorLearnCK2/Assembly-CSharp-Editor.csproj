@@ -11,7 +11,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{1F9DB678-50CB-742B-F46F-F85564C3FB8F}</ProjectGuid>
+    <ProjectGuid>{A0EBE9DD-9AF1-1DEF-CCE5-12DACD57B1C0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
@@ -275,8 +275,11 @@
  <Reference Include="UnityEditor.UWP.Extensions">
  <HintPath>G:/Program Files/Unity/2019.4.7f1/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.UWP.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
+ <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/16.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
+ </Reference>
  <Reference Include="nunit.framework">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>G:/Program Files/Unity/2019.4.7f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -633,86 +636,86 @@
  <HintPath>G:/Program Files/Unity/2019.4.7f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.TestRunner">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.TestRunner">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TerrainTools">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.TerrainTools.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.TerrainTools.dll</HintPath>
  </Reference>
  <Reference Include="Unity.ProGrids">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.ProGrids.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.ProGrids.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VSCode.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.ProBuilder">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.ProBuilder.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.ProBuilder.dll</HintPath>
  </Reference>
  <Reference Include="Unity.ProBuilder.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.ProBuilder.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.ProBuilder.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.ProBuilder.AssetIdRemapUtility">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.ProBuilder.AssetIdRemapUtility.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.ProBuilder.AssetIdRemapUtility.dll</HintPath>
  </Reference>
  <Reference Include="Unity.ProGrids.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.ProGrids.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.ProGrids.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
  </Reference>
  <Reference Include="Unity.CollabProxy.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Rider.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.ProBuilder.AddOns.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.ProBuilder.AddOns.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.ProBuilder.AddOns.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TerrainTools.Editor">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/Unity.TerrainTools.Editor.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/Unity.TerrainTools.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{D4939013-3B74-4DEA-3DA1-4DDB4117FAB9}</Project>
+      <Project>{C0DBE5A0-27BE-D703-1E95-55AF530177D8}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.Platform.Editor.csproj">
-      <Project>{AEC08EC8-BBF3-9CF1-C04C-E134FEDE186D}</Project>
+      <Project>{6098CACF-B31F-59B1-F3CA-EB7BEA5AF328}</Project>
       <Name>Oculus.Platform.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.VR.Editor.csproj">
-      <Project>{D96DD17E-AB65-8C75-08CD-D34F9DA1B366}</Project>
+      <Project>{26D922AA-32AA-E36B-B35E-BE3D37853399}</Project>
       <Name>Oculus.VR.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.VR.Scripts.Editor.csproj">
-      <Project>{D1A496B4-5950-3BB2-0A1B-E2DE24EB4A7D}</Project>
+      <Project>{CB0EBC94-05D2-BDF2-F32A-A6D50653E626}</Project>
       <Name>Oculus.VR.Scripts.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.VR.csproj">
-      <Project>{746D7148-2B11-E5E5-2C7A-83FF46AFD4C5}</Project>
+      <Project>{28DB543E-1E61-D9D1-12E6-F3EC7750D8B9}</Project>
       <Name>Oculus.VR</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.Platform.csproj">
-      <Project>{D131CC8E-7D0B-C8CC-B330-8AA5E1F3EE8D}</Project>
+      <Project>{5DC1DBBA-25A9-8D23-4434-56665A86B30A}</Project>
       <Name>Oculus.Platform</Name>
     </ProjectReference>
   </ItemGroup>

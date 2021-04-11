@@ -11,7 +11,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{D96DD17E-AB65-8C75-08CD-D34F9DA1B366}</ProjectGuid>
+    <ProjectGuid>{26D922AA-32AA-E36B-B35E-BE3D37853399}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Oculus.VR.Editor</AssemblyName>
@@ -275,8 +275,11 @@
  <Reference Include="UnityEditor.UWP.Extensions">
  <HintPath>G:/Program Files/Unity/2019.4.7f1/Editor/Data/PlaybackEngines/MetroSupport/UnityEditor.UWP.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
+ <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/16.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
+ </Reference>
  <Reference Include="nunit.framework">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>G:/Program Files/Unity/2019.4.7f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -633,21 +636,21 @@
  <HintPath>G:/Program Files/Unity/2019.4.7f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.TestRunner">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.TestRunner">
- <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
+ <HintPath>G:/Programming/VRMotorLearnCK/VRMotorLearnCK2/Library/ScriptAssemblies/UnityEngine.TestRunner.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Oculus.VR.csproj">
-      <Project>{746D7148-2B11-E5E5-2C7A-83FF46AFD4C5}</Project>
+      <Project>{28DB543E-1E61-D9D1-12E6-F3EC7750D8B9}</Project>
       <Name>Oculus.VR</Name>
     </ProjectReference>
   </ItemGroup>

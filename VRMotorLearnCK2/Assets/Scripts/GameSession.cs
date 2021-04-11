@@ -58,10 +58,11 @@ public class GameSession : MonoBehaviour
         playerData._Balls.Add(new OneBall(ID, t));
     }
 
-    public void add_Ball_Hand_Position(int ID, Vector3 ball_pos, Vector3 hand_pos, float t)
+    public void add_Ball_Hand_Position(int ID, Vector3 ball_pos, Vector3 hand_pos, float t, float time_ball_active)
     {
-        BallPositionInfo _mycurrentBallPositionInfo = new BallPositionInfo(ball_pos.x, ball_pos.y, ball_pos.z, hand_pos.x, hand_pos.y, hand_pos.z, t);
+        BallPositionInfo _mycurrentBallPositionInfo = new BallPositionInfo(ball_pos.x, ball_pos.y, ball_pos.z, hand_pos.x, hand_pos.y, hand_pos.z, t, time_ball_active);
         playerData._Balls[ID].add_BallPostionInfo(_mycurrentBallPositionInfo);
+
     }
     public void SaveIntoJson(){
         // nun speichern wir den aktuellen Stand ab ... dies 
@@ -107,6 +108,7 @@ public class GameSession : MonoBehaviour
         string saveFileName = "VP_" + vpNummer + "_TD_" + trainingsDay.ToString() + "_" + vorname + "_" + nachname + "_" + gebDat.Replace('.','-') + ".json";
         fullSaveFileName = Path.Combine(Application.streamingAssetsPath, relativeSavePath, saveFileName);
         //paradigma = Paradigma(jsonString);
+        Debug.Log("fillSaveFileName="+ fullSaveFileName);
         paradigma = JsonUtility.FromJson<Paradigma>(jsonString);
         //playerData.PrintPlayerData();
         //Paradigma paradigma = Paradigma(jsonString);
@@ -187,10 +189,11 @@ public class BallPositionInfo
     public float hand_y;
     public float hand_z;
     public float t;
+    public float time_ball_active;
 
-    public BallPositionInfo(float new_x, float new_y, float new_z, float new_hand_x, float new_hand_y, float new_hand_z, float new_t)
+    public BallPositionInfo(float new_x, float new_y, float new_z, float new_hand_x, float new_hand_y, float new_hand_z, float new_t, float new_time_ball_active)
     {
-        //time
+        //time seit application start
         t = new_t;
         ball_x = new_x;
         ball_y = new_y;
@@ -198,6 +201,8 @@ public class BallPositionInfo
         hand_x = new_hand_x;
         hand_y = new_hand_y;
         hand_z = new_hand_z;
+        // wie lange der Ball bisher bereits aktiv war
+        time_ball_active = new_time_ball_active;
         // hier muessen dann noch fuer den jeweiligen Zeitpunkt di
         // Infos rein ueber inverted und force und offset das wir sie ja dynamisch veraendern wollen
     }
@@ -214,9 +219,20 @@ public class BallPositionInfo
 
     public int numBalls;
     public float target_size;
-
+    public float ball_duration;
+    public float ball_size_max;
+    public float ball_size_min;
+    public float ball_veloc_min;
+    public float ball_veloc_max;
     public float ball_mass;
-
+    public float playarea_min_x;
+    public float playarea_min_y;
+    public float playarea_min_z;
+    public float playarea_max_x;
+    public float playarea_max_y;
+    public float playarea_max_z;
+    
+    
     public float gravity_X_min;
     public float gravity_X_max;
     public float gravity_Y_min;
