@@ -10,13 +10,17 @@ public class Spawner : MonoBehaviour {
     // [Range (1,100)]
     // public int spawnSize = 1;
     // public float minionOffset = 1;
+    private GameObject leftHand, rightHand, rightEye;
     public GameObject ball;
-
+private Vector3 initalBallSpawnPosition;
 //    private UnityAction spawnListener;
 //
-//    void Awake () {
-//        spawnListener = new UnityAction (Spawn);
-//    }
+    void Awake () {
+        //spawnListener = new UnityAction (Spawn);
+        leftHand = GameObject.Find("LeftHandAnchor");
+        rightHand = GameObject.Find("RightHandAnchor");
+        rightEye = GameObject.Find("RightEyeAnchor");
+    }
  //   public MyGameManager myGameManager;
     //public List<BallInfo> _BallInfos = new List<BallInfo>();
     // public MyBallCollection myBallCollection = new MyBallCollection();
@@ -51,7 +55,16 @@ public class Spawner : MonoBehaviour {
         //spawnPosition = new Vector3(0.217f, 1.068f, 0.53f);
         //spawnPosition = new Vector3(0.0f, 0.534f, 0.0f);
         //spawnPosition = new Vector3(0.0f, -0.951f, -2.65f);
-        spawnPosition = new Vector3(0.0f, 0.0f, -2.65f);
+        spawnPosition = new Vector3(rightEye.transform.position.x, rightEye.transform.position.y, rightEye.transform.position.z+0.2f);
+        Debug.Log("spawnPosition=" + spawnPosition.ToString());
+        Debug.Log("spawnrightEyePosition=" + rightEye.transform.position.ToString());
+        if (first_ball) {
+            initalBallSpawnPosition = spawnPosition;
+        }else{
+            return initalBallSpawnPosition;
+        }
+        
+//        spawnPosition = new Vector3(0.0f, 0.0f, -2.65f);
 
         return spawnPosition;
     }        

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEngine.EventSystems;
-
+using TMPro;
 public class MyGameManager : MonoBehaviour
 {
         // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
@@ -22,8 +22,15 @@ public class MyGameManager : MonoBehaviour
     private OVRCameraRig ovrCameraRig;
     private Spawner spawner;
     public GameObject wall;
+    private int punkteBlock;
+    private int punkteGesamt;
     public GameSession gameSession;
     public Parameter parameter;
+        public GameObject anzeigeTextBall;
+    public GameObject anzeigeTextTreffer;
+    
+
+//    public GameObject anzeigeTextPunkteGesamt;
     
 
     private void Awake()
@@ -36,6 +43,8 @@ public class MyGameManager : MonoBehaviour
         wall = GameObject.Find("Wall");
         Debug.Log(gameSession.paradigma.ToString());
         Physics.gravity = new Vector3(0.0f, -9.81f , 0.0f);
+        punkteGesamt = 0;
+        punkteBlock = 0;
         //Debug.Log("Awake");
     }
 
@@ -54,6 +63,7 @@ public class MyGameManager : MonoBehaviour
     public void SpawnNewBall()
     {
         current_ball_id += 1;
+        anzeigeTextBall.GetComponent<TextMeshPro>().SetText(current_ball_id.ToString());
         //gameSession.register_new_Ball(current_ball_id);
         parameter.configureParameterForNextBall();
         spawner.Spawn_A_NewBall();
@@ -72,7 +82,6 @@ public class MyGameManager : MonoBehaviour
     // public float get_current_target_radius(){
     //     // / 4 da das Object 4 Einheiten gross ist
     //     Debug.Log("currend target radius = " + gameSession.paradigma.target_size );
-        
     //     return gameSession.paradigma.target_size; //wall.transform.localScale.x;
     //     // the ball needs to know in which distance from the center
     //     // of the wall it will count as hit
@@ -87,29 +96,22 @@ public class MyGameManager : MonoBehaviour
         {
             //print("already initialized");
             //GameObject MM = FindObject
-
-
             Destroy(gameObject);
-
         }
         else
         {
             DontDestroyOnLoad(gameObject);
         }
-
     }
 
 
 
     void Start()
     {
-
         ovrPlayerController = FindObjectOfType<OVRPlayerController>();
         ovrCameraRig = FindObjectOfType<OVRCameraRig>();
-       
         StartCoroutine (CompensateHeadPosition());
         SpawnNewBall();
-
     }
 
 
@@ -190,6 +192,14 @@ public class MyGameManager : MonoBehaviour
 
         //Debug.Log("MY GAme manager is messaging");
         //Debug.Log( ovrPlayerController.transform.position.x + " " + ovrPlayerController.transform.position.y + " " + ovrPlayerController.transform.position.z);
+    }
+
+    public void register_Hit(){
+        punkteBlock+=1;
+        punkteGesamt+=1;
+        anzeigeTextTreffer.GetComponent<TextMeshPro>().SetText(punkteGesamt.ToString());
+//        anzeigeTextPunkteGesamt.GetComponent<TextMeshPro>().SetText(punkteGesamt.ToString());
+
     }
 
 }
