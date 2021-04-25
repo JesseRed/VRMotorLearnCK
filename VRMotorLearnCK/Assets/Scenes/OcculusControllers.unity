@@ -2054,7 +2054,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Versuchen sie den vor ihnen liegenden Ball
+  m_text: 'Versuchen Sie den vor Ihnen liegenden Ball
 
     in den Kreis zu werfen.'
   m_isRightToLeft: 0
