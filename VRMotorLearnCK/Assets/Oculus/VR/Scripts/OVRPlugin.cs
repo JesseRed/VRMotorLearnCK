@@ -2088,19 +2088,34 @@ public static class OVRPlugin
 			//Debug.Log("tmp Position after to carsten_offset_hand_vel = " + tmp.Position.ToString());
 
 
+			// Tremor
+			if (carsten_tremor[0]>0){
+				//Debug.Log("carsten_temor[0]>0 " + carsten_tremor[0]); 
+				//Debug.Log("Time.time =" + Time.time); 
+				//Debug.Log("carsten_temor[3] = " + carsten_tremor[3]); 
+				tmp.Position.x += 0.0f + (Mathf.Sin(Time.time/3*carsten_tremor[3]*3.14f)*carsten_tremor[0]/10*-1.0f);
+			}
+			if (carsten_tremor[1]>0){
+				//Debug.Log("carsten_temor[1]>0 " + carsten_tremor[1]); 
+				tmp.Position.y += 0.0f + (Mathf.Sin(Time.time/3*carsten_tremor[3]*3.14f)*carsten_tremor[1]/10*-1.0f);
+			}
+			if (carsten_tremor[2]>0){
+				tmp.Position.z += 0.0f + (Mathf.Sin(Time.time/3*carsten_tremor[3]*3.14f)*carsten_tremor[2]/10*-1.0f);				
+			}
 
 
 			// Tremor
-			if (carsten_tremor[0]>0){
-			
-				tmp.Position.x *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[0]/10*-1.0f);
-			}
-			if (carsten_tremor[1]>0){
-				tmp.Position.y *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[1]/10*-1.0f);
-			}
-			if (carsten_tremor[2]>0){
-				tmp.Position.z *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[2]/10*-1.0f);				
-			}
+			// if (carsten_tremor[0]>0){
+			// 	Debug.Log("carsten_temor[0]>0 " + carsten_tremor[0]); 
+			// 	tmp.Position.x *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[0]/10*-1.0f);
+			// }
+			// if (carsten_tremor[1]>0){
+			// 	Debug.Log("carsten_temor[1]>0 " + carsten_tremor[1]); 
+			// 	tmp.Position.y *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[1]/10*-1.0f);
+			// }
+			// if (carsten_tremor[2]>0){
+			// 	tmp.Position.z *= 1.0f + (Mathf.Sin(Time.time*carsten_tremor[3]*3.14f)*carsten_tremor[2]/10*-1.0f);				
+			// }
 			//Debug.Log("return tmp = " + tmp.Position.ToString());
 			return tmp;
 //			return OVRP_1_12_0.ovrp_GetNodePoseState(stepId, nodeId).Pose ;

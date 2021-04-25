@@ -34,9 +34,24 @@ public class Ball : MonoBehaviour
     public float par_mass;
     public Vector3 par_gravity;
     public Vector3 par_offset_hand_pos;
+    private Vector3 lastHandPos;
+    //private GameObject OVRPlayerController;
+private GameObject oVRCameraRig;
+private GameObject forwardDirection;
+private GameObject customRightHand;
 
+
+private GameObject trackingSpace;
+private GameObject centerEyeAnchor;
+private GameObject trackerAnchor;
+
+                private Vector3 ball_vel_frame_m1;
+ private Vector3 ball_vel_frame_m0; 
+
+private GameObject rightEye;
     void Start()
     {
+        //OVRInput.Controller myRTouch = RTouch;
         print("start the BAll Script on Start of Object Ball");
         myGameManager = FindObjectOfType<MyGameManager>();
         gameSession = FindObjectOfType<GameSession>();
@@ -46,13 +61,14 @@ public class Ball : MonoBehaviour
         wall = GameObject.Find("Wall");
         drawDot = FindObjectOfType<DrawDot>();
         lineObj = FindObjectOfType<LineObj>();
-        //leftHand = GameObject.Find("LeftHandAnchor");
-        //rightHand = GameObject.Find("RightHandAnchor");
-        leftHand = GameObject.Find("CustomHandLeft");
-        rightHand = GameObject.Find("CustomHandRight");
+
+        //rightHand = GameObject.Find("CustomHandRight");
         rightHand = GameObject.Find("RightHandAnchor");
-        Debug.Log(rightHand.ToString());
-        //rightHand.transform = new Vector3(1.0f, -1.0f, 1.0f);
+        customRightHand = GameObject.Find("CustomHandRight"); // has RigidBody (velocity)
+        ball_vel_frame_m0 = new Vector3(0.0f, 0.0f, 0.0f);
+        ball_vel_frame_m1 = new Vector3(0.0f, 0.0f, 0.0f);
+        rightEye = GameObject.Find("RightEyeAnchor");
+
 
         rb = GetComponent<Rigidbody>(); 
         
@@ -115,6 +131,10 @@ public class Ball : MonoBehaviour
         //rightHand.transform.position = rightHand.transform.position  + new Vector3(0.2f, 0.0f, 0.0f);
         Debug.Log("offset = " + parameter.current_offset_hand_pos.ToString());
         Debug.Log("transform right hand to " + rightHand.transform.position.ToString());
+        Debug.Log("transform ball       to " + transform.position.ToString());
+        // Debug.Log("velocity ball       to " + rb.velocity.ToString());
+
+
         
     }
 
@@ -122,13 +142,19 @@ public class Ball : MonoBehaviour
     {
         OVRPlugin.carsten_offset_hand_pos = new Vector3(0.0f, 0.0f, 0.0f);
         OVRPlugin.carsten_offset_hand_vel = new Vector3(1.0f, 1.0f, 1.0f);
-        OVRPlugin.carsten_invert = new Vector3(0.0f, 0.0f, 0.0f);;
-        OVRPlugin.carsten_tremor = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);;       
+        OVRPlugin.carsten_invert = new Vector3(0.0f, 0.0f, 0.0f);
+        OVRPlugin.carsten_tremor = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);       
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger, OVRInput.Controller.RTouch)>0){
+             //Debug.Log("RTouch");
+             }
+            Vector3 velocity = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.RTouch);
+             //Debug.Log(" XXX vel" + velocity.ToString());
+            
             gameSession.add_Ball_Hand_Position(ID, 
             transform.position.x,
             transform.position.y,
@@ -137,9 +163,47 @@ public class Ball : MonoBehaviour
             rightHand.transform.position.y, 
             rightHand.transform.position.z, 
             Time.time);
-        
+            //Debug.Log("transform right hand to " + rightHand.transform.position.ToString());
+            //Debug.Log("transform ball       to " + transform.position.ToString());
+            //Debug.Log("rb velocicty " + rb.velocity.ToString());
+            // Debug.Log("RE_pos rightEye= " + rightEye.transform.position.ToString());
+            // Debug.Log("RE_pos rightHand= " + rightHand.transform.position.ToString());
+            // Debug.Log("RE_pos customRightHand= " + customRightHand.transform.position.ToString());
+
+            // Debug.Log("RE_pos oVRCameraRig= " + oVRCameraRig.transform.position.ToString());
+            // Debug.Log("RE_pos trackingSpace= " + forwardDirection.transform.position.ToString());
+            // Debug.Log("RE_pos trackingSpace= " + trackingSpace.transform.position.ToString());
+            // Debug.Log("RE_pos centerEyeAnchor= " + centerEyeAnchor.transform.position.ToString());
+            // Debug.Log("RE_pos trackerAnchor= " + trackerAnchor.transform.position.ToString());
+            // Debug.Log("transform right hand to " + rightHand.transform.position.ToString());
+            // Debug.Log("transform ball       to " + transform.position.ToString());
+            // Debug.Log("velocity ball       to " + rb.velocity.ToString());
+            // Debug.Log("velocity handRB     to " + handRB.velocity.ToString());
+            // Debug.Log("velocity VM     to " + vmRB.velocity.ToString());
+            // Debug.Log("local vel = " + handRB.GetRelativePointVelocity(rightHand.transform.localPosition));
+            // Debug.Log("customRightHand pos " + customRightHand.transform.position.ToString());
+
+                // Debug.Log("velocity handAnchorRB     vel " + rb_rightHandAnchor.velocity.ToString());
+//            lastHandPos = rightHand.transform.position;
+
         //Debug.Log("Grabbed = " + transform.GetComponent<OVRGrabbable>().isGrabbed);
-        
+        if (is_grabbed && transform.GetComponent<OVRGrabbable>().isGrabbed){
+                // ball_vel_frame_m3 = ball_vel_frame_m2;
+                // ball_vel_frame_m2 = ball_vel_frame_m1;
+                if (rb.velocity == Vector3.zero){
+                    //Debug.Log("grabbed and zero");
+                }
+                if (ball_vel_frame_m0 != Vector3.zero){
+                    ball_vel_frame_m1 = ball_vel_frame_m0;
+                }
+                if (rb.velocity != Vector3.zero){
+                    ball_vel_frame_m0 = rb.velocity;
+                }
+
+                //Debug.Log("grabbed adapt_velocity_to_old_ball_velocity rb.velocity" + rb.velocity.ToString());
+                //Debug.Log("grabbed adapt_velocity_to_old_ball_velocity ball_vel_frame_m1" + ball_vel_frame_m1.ToString());
+                //Debug.Log("grabbed adapt_velocity_to_old_ball_velocity ball_vel_frame_m0" + ball_vel_frame_m0.ToString());
+        }        
         // test if Ball was grabbed
         if (!is_grabbed && transform.GetComponent<OVRGrabbable>().isGrabbed){
             is_grabbed = true;
@@ -155,7 +219,71 @@ public class Ball : MonoBehaviour
             // this is necessary if the ball was grapped a second time
             is_grabbed = false;
             gameSession.set_leave_the_Hand_Time(ID, Time.time);
+            // Debug.Log("beim loslassen current invert " + parameter.current_invert.ToString());
+            // Debug.Log("rb velocicty beim loslassen " + rb.velocity.ToString());
+            // Debug.Log("hand velocicty beim loslassen " + handRB.velocity.ToString());
+           // Debug.Log("VM velocicty beim loslassen " + vmRB.velocity.ToString());
+           // Debug.Log("velocity handAnchorRB beim loslassen" + rb_rightHandAnchor.velocity.ToString());
+            //Vector3 velocityx = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.RTouch);
+            // Debug.Log("velocity OVRInput beim loslassen" + velocityx.ToString());
+            // Debug.Log("loslassen old Ball vel Frame 0 " + ball_vel_frame_m0.ToString());
+            //rb.velocity = ball_vel_frame_m1;
+            //adapt_velocity_from_invert();
+            adapt_velocity_to_old_ball_velocity();
+           // rb.velocity = handRB.velocity;
+            // Debug.Log("rb velocicty beim loslassen2 " + rb.velocity.ToString());
+
+            // Debug.Log("loslassen old Ball vel Frame 3 " + ball_vel_frame_m3.ToString());
+            // Debug.Log("loslassen old Ball vel Frame 2 " + ball_vel_frame_m2.ToString());
+            // Debug.Log("loslassen old Ball vel Frame 1 " + ball_vel_frame_m1.ToString());
+            // ich verstehe nicht warum beim invert der Ball in die Falsche Richtung geht
+            // daher nehme ich die vorzeichen der Ballgeschwindigkeit ein Frame vor dem loslassen
+            // die Zahlen ersetze ich dann mit der aktuellen Ballgeschwindigkeit
+
+
+
+  //          Vector3 currentPos = transform.position;
+   //         transform.position = lastHandPos;
+    //        transform.Translate(currentPos);
         }
+
+    }
+
+    
+
+    private void adapt_velocity_to_old_ball_velocity(){
+        Vector3 new_vel = new Vector3(1.0f, 1.0f, 1.0f);
+        // normiere die alten Geschwindigkeiten auf 1 oder -1 
+        //Debug.Log("adapt_velocity_to_old_ball_velocity ball_vel_frame_m1" + ball_vel_frame_m1.ToString());
+        //Debug.Log("adapt_velocity_to_old_ball_velocity ball_vel_frame_m0" + ball_vel_frame_m0.ToString());
+        //Debug.Log("adapt_velocity_to_old_ball_velocity rb.velocity" + rb.velocity.ToString());
+        if (ball_vel_frame_m0 == Vector3.zero){
+            Debug.Log("zero");
+        }
+
+        if (ball_vel_frame_m0 != Vector3.zero){
+            new_vel = ball_vel_frame_m0;
+        }else if (ball_vel_frame_m1!=Vector3.zero){
+            new_vel = ball_vel_frame_m1;
+        }else if (rb.velocity != Vector3.zero){
+            new_vel = rb.velocity;
+        }
+        new_vel[0] = new_vel[0]/Mathf.Abs(new_vel[0]);
+        new_vel[1] = new_vel[1]/Mathf.Abs(new_vel[1]);
+        new_vel[2] = new_vel[2]/Mathf.Abs(new_vel[2]);
+
+        // multipliziere diese korrekten Vorzeichen nun mit dem Betrag der korrekten Geschwindigkeit
+        new_vel[0] = new_vel[0]*Mathf.Abs(rb.velocity[0]);
+        new_vel[1] = new_vel[1]*Mathf.Abs(rb.velocity[1]);
+        new_vel[2] = new_vel[2]*Mathf.Abs(rb.velocity[2]);
+
+        // if (parameter.current_invert[0]>0){ multiplier[0] = parameter.current_invert[0]*-1.0f; }
+        // if (parameter.current_invert[1]>0){ multiplier[1] = parameter.current_invert[1]*-1.0f; }
+        // if (parameter.current_invert[2]>0){ multiplier[2] = parameter.current_invert[2]*-1.0f; }
+        rb.velocity = new_vel;
+//        if (parameter.current_invert[0]>0){ rb.velocity[0] = rb.velocity[0]*-1.0f; }
+ //       if (parameter.current_invert[1]>0){ rb.velocity[1] = rb.velocity[1]*-1.0f; }
+ //       if (parameter.current_invert[2]>0){ rb.velocity[2] = rb.velocity[2]*-1.0f; }
     }
 
     private void intitialize_forces_on_ball()
@@ -250,7 +378,9 @@ public class Ball : MonoBehaviour
     void registerTreffer()
     {
         Debug.Log("HHHHHHHHHHHHHHHHHHHHHHHIIIIIIIIIIIITTTTTT a Hit was registered in the Game Manager");
+        myGameManager.register_Hit();
         gameSession.SaveIntoJson();
+
     }
 
 
