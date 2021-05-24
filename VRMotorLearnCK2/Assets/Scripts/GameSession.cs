@@ -266,8 +266,29 @@ public class BallPositionInfo
     public float hand_tremor_freq;
     public int Adaptive;
     public float desired_hit_rate;
+    public float offset_hand_pos_diff;
+    public float offset_hand_vel_diff;
+    public float hand_invert_diff;
+    public float hand_tremor_diff;
+    public bool adapt_ball_size;
+    public bool adapt_veloc;
+    public bool adapt_offset_hand_pos_X;
+    public bool adapt_offset_hand_pos_Y;
+    public bool adapt_offset_hand_pos_Z;
+    public bool adapt_offset_hand_vel_X;
+    public bool adapt_offset_hand_vel_Y;
+    public bool adapt_offset_hand_vel_Z;
+    public bool adapt_invert_X;
+    public bool adapt_invert_Y;
+    public bool adapt_invert_Z;
+    public bool adapt_tremor_X;
+    public bool adapt_tremor_Y;
+    public bool adapt_tremor_Z;
 
-
+    public float spiegelpunkt_der_invertierung_x;
+    public float spiegelpunkt_der_invertierung_y;
+    public float spiegelpunkt_der_invertierung_z;
+    
 
     }
 

@@ -14,8 +14,8 @@ public class PlayBall : MonoBehaviour {
 	
 	// How many points you want on the curve
 	//uint numberOfPoints = 300;
-	Vector3 playarea_min;
-	Vector3 playarea_max;
+	private Vector3 playarea_min;
+	private Vector3 playarea_max;
 	// Parametric constant: 0.0 for the uniform spline, 0.5 for the centripetal spline, 1.0 for the chordal spline
 	public float alpha = 0.5f;
     // Start is called before the first frame update
@@ -55,10 +55,12 @@ public class PlayBall : MonoBehaviour {
         rightEye = GameObject.Find("RightEyeAnchor");
         // die Bounding Box wird bei jedem Ball neu gesetzt falls der Player sich mit der Zeit 
         // anders setzt
-        set_current_playarea_and_object_transform();
-        
-        
-                
+        playarea_center = parameter.GetSpawnPosition();
+        transform.position = playarea_center;
+        playarea_min = parameter.get_playarea_min();
+        playarea_max = parameter.get_playarea_max();
+        // current difficulty wird geholt (nicht berechnet)
+        parameter.apply_current_difficulty_to_hand();
                 
         // setting the playarea in which the object travels
         // Vector3 min = new Vector3(0.0f, -1.0f, 0.2f);
@@ -83,30 +85,37 @@ public class PlayBall : MonoBehaviour {
         
     }
 
-    void set_current_playarea_and_object_transform(){
-        // float xh = rightHand.transform.position.x;
-        // float yh = rightHand.transform.position.y;
-        // float zh = rightHand.transform.position.z;
-        // float xe = rightEye.transform.position.x;
-        // float ye = rightEye.transform.position.y;
-        // float ze = rightEye.transform.position.z; 
+    // void set_current_playarea_and_object_transform(){
+    //     // float xh = rightHand.transform.position.x;
+    //     // float yh = rightHand.transform.position.y;
+    //     // float zh = rightHand.transform.position.z;
+    //     // float xe = rightEye.transform.position.x;
+    //     // float ye = rightEye.transform.position.y;
+    //     // float ze = rightEye.transform.position.z; 
 
-        // playarea_min[0] = rightEye.transform.position.x-0.2f;
-        // playarea_min[1] = rightEye.transform.position.y-0.3f;
-        // playarea_min[2] = rightEye.transform.position.z+0.15f;
-        // playarea_max[0] = rightEye.transform.position.x+0.2f;
-        // playarea_max[1] = rightEye.transform.position.y-0.1f;
-        // playarea_max[2] = rightEye.transform.position.z+0.4f;
+    //     // playarea_min[0] = rightEye.transform.position.x-0.2f;
+    //     // playarea_min[1] = rightEye.transform.position.y-0.3f;
+    //     // playarea_min[2] = rightEye.transform.position.z+0.15f;
+    //     // playarea_max[0] = rightEye.transform.position.x+0.2f;
+    //     // playarea_max[1] = rightEye.transform.position.y-0.1f;
+    //     // playarea_max[2] = rightEye.transform.position.z+0.4f;
 
-        playarea_min[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_min_x;
-        playarea_min[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_min_y;
-        playarea_min[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_min_z;
-        playarea_max[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_max_x;
-        playarea_max[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_max_y;
-        playarea_max[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_max_z;
-        playarea_center = (playarea_min+playarea_max)/2.0f;
-        transform.position = playarea_center;
-    }
+    //     // hier invert abfragen 
+    //     // wenn invert aktiviert ist, dann muss die Position von rightEye korrigiert werden um den Spiegelpunkt
+
+
+    //     // playarea_min[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_min_x;
+    //     // playarea_min[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_min_y;
+    //     // playarea_min[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_min_z;
+    //     // playarea_max[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_max_x;
+    //     // playarea_max[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_max_y;
+    //     // playarea_max[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_max_z;
+    //     // playarea_center = (playarea_min+playarea_max)/2.0f;
+    //     // transform.position = playarea_center;
+    //     transform.position = parameter.GetSpawnPosition();
+    //     // apply the estimated difficulty setting to the hand (change in offset, vel, invert, tremor)
+    //     parameter.apply_current_difficulty_to_hand();
+    // }
 
 	void Update()
 	{
@@ -116,7 +125,7 @@ public class PlayBall : MonoBehaviour {
         myline.SetPosition(1, transform.position);
         // waiting that the finger comes near
         if (is_waitForStart) {
-            //Debug.Log("Catmul:Update is_waitForStart() with currentFingerBallDist = " + currentFingerBallDist);
+            Debug.Log("Catmul:Update is_waitForStart() with currentFingerBallDist = " + currentFingerBallDist);
             if (currentFingerBallDist<0.01f){
                 // ####################
                 // Der start des Balls
@@ -142,12 +151,17 @@ public class PlayBall : MonoBehaviour {
             }
             // hier sollten noch andere Parameter
             time_ball_active = Time.time-time_start_moving;
-            //Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
+            Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
             gameSession.add_Ball_Hand_Position(ID, transform.position, rightHand.transform.position, Time.time, time_ball_active);
             parameter.push_infos(currentFingerBallDist);
             if ( time_ball_active>ball_duration){
+                parameter.register_finished_block();
+                parameter.reset_hand();
+                is_stopped = true;
+                is_active = false;
+                gameSession.SaveIntoJson();
                 Debug.Log("time_ball_active>ball_duration");
-                 StartCoroutine(save_and_destroy());
+                StartCoroutine(save_and_destroy());
             }
         }
 	}
@@ -174,10 +188,9 @@ public class PlayBall : MonoBehaviour {
 
     IEnumerator save_and_destroy(){
         Debug.Log("PlayBall:save_and_destroy()");
-        is_stopped = true;
-        is_active = false;
-        gameSession.SaveIntoJson();
-        yield return new WaitForSeconds(1.5f);
+        // setzte alle veraenderungen der Handrepraesentation zurueck
+
+        yield return new WaitForSeconds(0.5f);
         Debug.Log("PlayBall:save_and_destroy: Now Destroy ball Nr " + ID);
         Destroy(gameObject);
     }

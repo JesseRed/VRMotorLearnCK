@@ -201,6 +201,7 @@
      <Compile Include="Assets\Scripts\MainMenu.cs" />
      <Compile Include="Assets\Scripts\MyGameManager.cs" />
      <Compile Include="Assets\Scripts\Parameter.cs" />
+     <Compile Include="Assets\Scripts\Parameter_old.cs" />
      <Compile Include="Assets\Scripts\PlayBall.cs" />
      <Compile Include="Assets\Scripts\SaveData.cs" />
      <Compile Include="Assets\Scripts\SelfDestruct.cs" />
