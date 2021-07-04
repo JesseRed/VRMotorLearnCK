@@ -27,6 +27,7 @@ public class PlayBall : MonoBehaviour {
     public float currentFingerBallDist;
     public bool is_waitForStart = false;
     public bool is_stopped = true;
+    public bool is_invert_applied = false;
     public bool is_active = false;
     public MyGameManager myGameManager;
     public GameSession gameSession;
@@ -55,12 +56,10 @@ public class PlayBall : MonoBehaviour {
         rightEye = GameObject.Find("RightEyeAnchor");
         // die Bounding Box wird bei jedem Ball neu gesetzt falls der Player sich mit der Zeit 
         // anders setzt
-        playarea_center = parameter.GetSpawnPosition();
-        transform.position = playarea_center;
-        playarea_min = parameter.get_playarea_min();
-        playarea_max = parameter.get_playarea_max();
-        // current difficulty wird geholt (nicht berechnet)
-        parameter.apply_current_difficulty_to_hand();
+
+        // moved to touch of ball 04.07.2021
+        // current difficulty wird angewendet (nicht berechnet)
+        // parameter.apply_current_difficulty_to_hand();
                 
         // setting the playarea in which the object travels
         // Vector3 min = new Vector3(0.0f, -1.0f, 0.2f);
@@ -84,38 +83,38 @@ public class PlayBall : MonoBehaviour {
         Debug.Log("STart PlayBall");
         
     }
+  
 
-    // void set_current_playarea_and_object_transform(){
-    //     // float xh = rightHand.transform.position.x;
-    //     // float yh = rightHand.transform.position.y;
-    //     // float zh = rightHand.transform.position.z;
-    //     // float xe = rightEye.transform.position.x;
-    //     // float ye = rightEye.transform.position.y;
-    //     // float ze = rightEye.transform.position.z; 
+    IEnumerator reinitiate_ball_with_invert()
+    {
+        // der Ball ist bereits in einer Position initiiert worden
+        // es wurde dann darauf gewartet, dass der Finger den Ball beruehrt
+        // diese Coroutine wurde dann gestartet um die moegliche Invertierung
+        // auf die Hand vorzunehmen
+            Debug.Log("before parameter.apply_current_difficulty_to_hand()");
+            Debug.Log("rightHand.transform.position="+ rightHand.transform.position.ToString());
+            Debug.Log("Ball.transform.position="+ transform.position.ToString());
+            parameter.apply_current_difficulty_to_hand();
+            yield return new WaitForSeconds(0.05f);
+            Debug.Log("after1 ... rightHand.transform.position="+ rightHand.transform.position.ToString());
+            Debug.Log("after1 ... Ball.transform.position="+ transform.position.ToString());
 
-    //     // playarea_min[0] = rightEye.transform.position.x-0.2f;
-    //     // playarea_min[1] = rightEye.transform.position.y-0.3f;
-    //     // playarea_min[2] = rightEye.transform.position.z+0.15f;
-    //     // playarea_max[0] = rightEye.transform.position.x+0.2f;
-    //     // playarea_max[1] = rightEye.transform.position.y-0.1f;
-    //     // playarea_max[2] = rightEye.transform.position.z+0.4f;
+            playarea_center = parameter.GetSpawnPosition2();
+            transform.position = playarea_center;
+            playarea_min = parameter.get_playarea_min();
+            playarea_max = parameter.get_playarea_max();
+            Debug.Log("after2 ... rightHand.transform.position="+ rightHand.transform.position.ToString());
+            Debug.Log("after2 ... Ball.transform.position="+ transform.position.ToString());
 
-    //     // hier invert abfragen 
-    //     // wenn invert aktiviert ist, dann muss die Position von rightEye korrigiert werden um den Spiegelpunkt
+            // setze die Startzeit des Balls
+            time_start_moving = Time.time;
+            Debug.Log("time_start_moving = " + time_start_moving);
+            is_waitForStart = false;
+            is_stopped = false;
+            is_active = true;
 
+    }
 
-    //     // playarea_min[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_min_x;
-    //     // playarea_min[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_min_y;
-    //     // playarea_min[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_min_z;
-    //     // playarea_max[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_max_x;
-    //     // playarea_max[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_max_y;
-    //     // playarea_max[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_max_z;
-    //     // playarea_center = (playarea_min+playarea_max)/2.0f;
-    //     // transform.position = playarea_center;
-    //     transform.position = parameter.GetSpawnPosition();
-    //     // apply the estimated difficulty setting to the hand (change in offset, vel, invert, tremor)
-    //     parameter.apply_current_difficulty_to_hand();
-    // }
 
 	void Update()
 	{
@@ -124,17 +123,16 @@ public class PlayBall : MonoBehaviour {
         myline.SetPosition(0, rightHand.transform.position);
         myline.SetPosition(1, transform.position);
         // waiting that the finger comes near
-        if (is_waitForStart) {
-            Debug.Log("Catmul:Update is_waitForStart() with currentFingerBallDist = " + currentFingerBallDist);
+        if (is_waitForStart && !is_invert_applied) {
+            //Debug.Log("Catmul:Update is_waitForStart() with currentFingerBallDist = " + currentFingerBallDist);
             if (currentFingerBallDist<0.01f){
                 // ####################
                 // Der start des Balls
-                // setze die Startzeit des Balls
-                time_start_moving = Time.time;
-                Debug.Log("time_start_moving = " + time_start_moving);
-                is_waitForStart = false;
-                is_stopped = false;
-                is_active = true;
+                // current difficulty wird angewendet (nicht berechnet)
+                is_invert_applied = true;
+                StartCoroutine(reinitiate_ball_with_invert());
+
+
             }
         }
         if (!is_stopped){
@@ -151,8 +149,10 @@ public class PlayBall : MonoBehaviour {
             }
             // hier sollten noch andere Parameter
             time_ball_active = Time.time-time_start_moving;
-            Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
+            //Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
             gameSession.add_Ball_Hand_Position(ID, transform.position, rightHand.transform.position, Time.time, time_ball_active);
+            Debug.Log("Ball Position = " + transform.position);
+            Debug.Log("Hand Position = " + rightHand.transform.position);
             parameter.push_infos(currentFingerBallDist);
             if ( time_ball_active>ball_duration){
                 parameter.register_finished_block();
@@ -205,7 +205,7 @@ public class PlayBall : MonoBehaviour {
     //     playarea_max = max;
     // }
     void addwaypoint(Vector3 min, Vector3 max){
-            if (waypointList.Count==0){
+            if (waypointList.Count<3){
                 waypointList.Add(transform.position);
             }
             float x = Random.Range(min.x, max.x);

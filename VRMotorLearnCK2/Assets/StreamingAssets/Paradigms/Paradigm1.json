@@ -1,6 +1,6 @@
 {
     "numBalls":4,
-    "ball_duration":5,
+    "ball_duration":8,
     "adapt_ball_size" : true,
     "ball_size_min": 0.01,
     "ball_size_max": 0.03,
@@ -12,14 +12,14 @@
     "playarea_min_z": 0.1,
     "playarea_max_x": 0.2,
     "playarea_max_y": 0.0,
-    "playarea_max_z": 0.4,
-    "adapt_offset_hand_pos_X" : true,
+    "playarea_max_z": 0.3,
+    "adapt_offset_hand_pos_X" : false,
     "offset_hand_pos_X_min" : 0.0,
     "offset_hand_pos_X_max" : 0.0,
     "adapt_offset_hand_pos_Y" : true,
     "offset_hand_pos_Y_min" : 0.0,
     "offset_hand_pos_Y_max" : 0.0,
-    "adapt_offset_hand_pos_Z" : true,
+    "adapt_offset_hand_pos_Z" : false,
     "offset_hand_pos_Z_min" : 0.0,
     "offset_hand_pos_Z_max" : 0.0,
     "adapt_offset_hand_vel_X" : true,
@@ -52,5 +52,5 @@
     "hand_tremor_diff" : 3.0,
     "spiegelpunkt_der_invertierung_x" : 0.0,
     "spiegelpunkt_der_invertierung_y" : -0.1,
-    "spiegelpunkt_der_invertierung_z" : -0.25
+    "spiegelpunkt_der_invertierung_z" : 0.25
 }

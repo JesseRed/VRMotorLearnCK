@@ -72,6 +72,9 @@ public class Parameter : MonoBehaviour
     public int max_moegliche_punkteLast5Blocks = 0;
     public int max_moegliche_punkteGesamt = 0;
     public int punkteGesamt = 0;
+    private Vector3 uninverted_right_eye = new Vector3(0.0f,0.0f,0.0f);
+    private Vector3 uninverted_right_hand = new Vector3(0.0f,0.0f,0.0f);
+    
     //public GameObject anzeigeText;
     public GameObject anzeigeTextBlock;
     public GameObject anzeigeTextPunkteBlock;
@@ -93,7 +96,8 @@ public class Parameter : MonoBehaviour
    //     leftHand = GameObject.Find("CustomHandLeft");
   //      rightHand = GameObject.Find("CustomHandRight");
         leftHand = GameObject.Find("LeftHandAnchor");
-        rightHand = GameObject.Find("RightHandAnchor");
+        //rightHand = GameObject.Find("RightHandAnchor");
+        rightHand = GameObject.Find("hands:b_r_index_ignore");
         rightEye = GameObject.Find("RightEyeAnchor");
         //anzeigeTextPunkteBlock = GameObject.Find("AnzeigeTextPunkteBlock");
         //anzeigeTextPunkteGesamt = GameObject.Find("AnzeigeTextPunkteGesamt");
@@ -247,22 +251,55 @@ public class Parameter : MonoBehaviour
 
     }
  
+    IEnumerator save_uninverted_pos(){
+        // da ich es nicht hinbekomme die neuen Positionen 
+        // zu berechnen speichere ich die alten ab
+        yield return new WaitForSeconds(0.03f);
+        uninverted_right_eye[0] = rightEye.transform.position.x;
+        uninverted_right_eye[1] = rightEye.transform.position.y;
+        uninverted_right_eye[2] = rightEye.transform.position.z;
+        uninverted_right_hand[0] = rightHand.transform.position.x;
+        uninverted_right_hand[1] = rightHand.transform.position.y;
+        uninverted_right_hand[2] = rightHand.transform.position.z;
+        
+    }
     public void reset_hand(){
         OVRPlugin.carsten_offset_hand_pos = new Vector3(0.0f, 0.0f, 0.0f);
         OVRPlugin.carsten_offset_hand_vel = new Vector3(1.0f, 1.0f, 1.0f);
         OVRPlugin.carsten_invert = new Vector3(0.0f, 0.0f, 0.0f);
         OVRPlugin.carsten_tremor = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+        StartCoroutine(save_uninverted_pos());
+
     }
     public void apply_current_difficulty_to_hand(){
+        Debug.Log("start apply_current_difficulty_to_hand()");
+
         OVRPlugin.carsten_spiegelpunkt_der_invertierung = new Vector3(
             gameSession.paradigma.spiegelpunkt_der_invertierung_x, 
             gameSession.paradigma.spiegelpunkt_der_invertierung_y, 
             gameSession.paradigma.spiegelpunkt_der_invertierung_z 
             );
+
+        // 04.07.2021 
+        // setzte den neuen Spiegelpunkt in die Mitte der Spielflaeche
+        // das ist zugleich auch die Spawn Position
+        //OVRPlugin.carsten_spiegelpunkt_der_invertierung = playarea_center;
         OVRPlugin.carsten_offset_hand_pos = ballDifficulty.get_offset_hand_pos();
         OVRPlugin.carsten_offset_hand_vel = ballDifficulty.get_offset_hand_vel();
         OVRPlugin.carsten_invert = ballDifficulty.get_invert();
         OVRPlugin.carsten_tremor = ballDifficulty.get_tremor();
+        Debug.Log("OVRPlugin.carsten_spiegelpunkt_der_invertierung = "+ OVRPlugin.carsten_spiegelpunkt_der_invertierung);
+        Debug.Log("OVRPlugin.carsten_offset_hand_pos = "+ OVRPlugin.carsten_offset_hand_pos);
+        Debug.Log("OVRPlugin.carsten_invert = "+ OVRPlugin.carsten_invert);
+        // if (OVRPlugin.carsten_invert[0]>0.1){
+        //     eyeposition_offset_x = gameSession.paradigma.spiegelpunkt_der_invertierung_x;
+        // }
+        // if (OVRPlugin.carsten_is_invert_in_effect_Y){
+        //     eyeposition_offset_y = gameSession.paradigma.spiegelpunkt_der_invertierung_y;
+        // }
+        // if (OVRPlugin.carsten_is_invert_in_effect_Z){
+        //     eyeposition_offset_z = gameSession.paradigma.spiegelpunkt_der_invertierung_z;
+        // }
     }
 
     public Vector3 GetSpawnPosition () {
@@ -308,9 +345,128 @@ public class Parameter : MonoBehaviour
         // Debug.Log("paradigma MIN =" + gameSession.paradigma.playarea_min_x + gameSession.paradigma.playarea_min_y + gameSession.paradigma.playarea_min_z);
         // Debug.Log("paradigma MAX =" + gameSession.paradigma.playarea_max_x + gameSession.paradigma.playarea_max_y + gameSession.paradigma.playarea_max_z);
         // Debug.Log("spawnQuader MIN =" + playarea_min.ToString());
-        // Debug.Log("spawnQuader MAX =" + playarea_max.ToString());
-        // Debug.Log("spawnPosition=" + playarea_center.ToString());
-        // Debug.Log("spawnrightEyePosition=" + rightEye.transform.position.ToString());
+        //Debug.Log("spawnQuader MAX =" + playarea_max.ToString());
+        Debug.Log("INVERT_X = " + OVRPlugin.carsten_is_invert_in_effect_X);
+        Debug.Log("INVERT_Y = " + OVRPlugin.carsten_is_invert_in_effect_Y);
+        Debug.Log("INVERT_Z = " + OVRPlugin.carsten_is_invert_in_effect_Z);
+        Debug.Log("Right Hand = " + rightHand.transform.position.ToString());
+        Debug.Log("eyeposition = " + rightEye.transform.position.ToString());
+        Debug.Log("eyeposition_offset_x = " + eyeposition_offset_x.ToString());
+        Debug.Log("eyeposition_offset_y = " + eyeposition_offset_y.ToString());
+        Debug.Log("eyeposition_offset_z = " + eyeposition_offset_z.ToString());
+        Debug.Log("spawnPosition=" + playarea_center.ToString());
+        Debug.Log("spawnrightEyePosition=" + rightEye.transform.position.ToString());
+        Debug.Log("playarea_min = " + playarea_min.ToString());
+        Debug.Log("playarea_max = " + playarea_max.ToString());
+        Debug.Log("old eye Pos = " + uninverted_right_eye.ToString());
+        return(playarea_center);
+    }
+    
+    public Vector3 GetSpawnPosition2 () {
+        // gibt die Spawn Position des Balls zurueck
+        // Die spawn position sollte sich in der Mitte eines Quaders befinden, der 
+        // durch das Parameter File vorgegeben ist
+        // es sollte sich aber immer auch in relation zu der aktuellen
+        // Position des Headsets befinden
+        Debug.Log("-----------------------------");
+        Debug.Log("----GetSpawn Position 2------");
+        
+        // den offset muessen wir nur einfuehren wenn die invertierung wirklich auch im OvRPlugin angewendet wurden
+        float eyeposition_offset_x = 0.0f;
+        float eyeposition_offset_y = 0.0f;
+        float eyeposition_offset_z = 0.0f;
+
+
+        if (OVRPlugin.carsten_is_invert_in_effect_X){
+            //eyeposition_offset_x = gameSession.paradigma.spiegelpunkt_der_invertierung_x;
+            eyeposition_offset_x = uninverted_right_eye[0]- rightEye.transform.position.x;
+        }
+        if (OVRPlugin.carsten_is_invert_in_effect_Y){
+//            eyeposition_offset_y = gameSession.paradigma.spiegelpunkt_der_invertierung_y;
+            eyeposition_offset_y = uninverted_right_eye[1]- rightEye.transform.position.y;
+    
+        }
+        if (OVRPlugin.carsten_is_invert_in_effect_Z){
+            //eyeposition_offset_z = gameSession.paradigma.spiegelpunkt_der_invertierung_z*(-2.0f);
+            eyeposition_offset_z = uninverted_right_eye[2]- rightEye.transform.position.z;
+        }
+
+
+        // playarea_min[0] = rightEye.transform.position.x + eyeposition_offset_x + gameSession.paradigma.playarea_min_x;
+        // playarea_min[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_min_y;
+        // playarea_min[2] = rightEye.transform.position.z + eyeposition_offset_z +gameSession.paradigma.playarea_min_z;
+        // playarea_max[0] = rightEye.transform.position.x + eyeposition_offset_x +gameSession.paradigma.playarea_max_x;
+        // playarea_max[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_max_y;
+        // playarea_max[2] = rightEye.transform.position.z + eyeposition_offset_z +gameSession.paradigma.playarea_max_z;
+        // playarea_center = (playarea_min+playarea_max)/2.0f;
+
+
+        playarea_min[0] = rightEye.transform.position.x + eyeposition_offset_x + gameSession.paradigma.playarea_min_x;
+        playarea_min[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_min_y;
+        playarea_min[2] = rightEye.transform.position.z + eyeposition_offset_z +gameSession.paradigma.playarea_min_z;
+        playarea_max[0] = rightEye.transform.position.x + eyeposition_offset_x +gameSession.paradigma.playarea_max_x;
+        playarea_max[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_max_y;
+        playarea_max[2] = rightEye.transform.position.z + eyeposition_offset_z +gameSession.paradigma.playarea_max_z;
+        playarea_center = (playarea_min+playarea_max)/2.0f;
+
+
+        playarea_min[0] = rightEye.transform.position.x + eyeposition_offset_x + gameSession.paradigma.playarea_min_x;
+        playarea_min[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_min_y;
+        playarea_min[2] = gameSession.paradigma.playarea_min_z;
+        playarea_max[0] = rightEye.transform.position.x + eyeposition_offset_x +gameSession.paradigma.playarea_max_x;
+        playarea_max[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_max_y;
+        playarea_max[2] = gameSession.paradigma.playarea_max_z;
+        playarea_center = (playarea_min+playarea_max)/2.0f;
+
+
+
+
+
+        // playarea_min[0] = rightEye.transform.position.x + eyeposition_offset_x + gameSession.paradigma.playarea_min_x;
+        // playarea_min[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_min_y;
+        // playarea_min[2] = rightEye.transform.position.z + eyeposition_offset_z +gameSession.paradigma.playarea_min_z;
+        // playarea_max[0] = rightEye.transform.position.x + eyeposition_offset_x +gameSession.paradigma.playarea_max_x;
+        // playarea_max[1] = rightEye.transform.position.y + eyeposition_offset_y +gameSession.paradigma.playarea_max_y;
+        // playarea_max[2] = rightEye.transform.position.z + eyeposition_offset_z +gameSession.paradigma.playarea_max_z;
+        // playarea_center = (playarea_min+playarea_max)/2.0f;
+
+
+
+//        spawnPosition = new Vector3(rightEye.transform.position.x, rightEye.transform.position.y, rightEye.transform.position.z+0.2f);
+        // Debug.Log("----------------------------------");
+        // Debug.Log("----------------------------------");
+        // Debug.Log("----------------------------------");
+        // Debug.Log("GetSpawnPosition");
+
+        // Debug.Log("paradigma MIN =" + gameSession.paradigma.playarea_min_x + gameSession.paradigma.playarea_min_y + gameSession.paradigma.playarea_min_z);
+        // Debug.Log("paradigma MAX =" + gameSession.paradigma.playarea_max_x + gameSession.paradigma.playarea_max_y + gameSession.paradigma.playarea_max_z);
+        // Debug.Log("spawnQuader MIN =" + playarea_min.ToString());
+        //Debug.Log("spawnQuader MAX =" + playarea_max.ToString());
+        Debug.Log("INVERT_X = " + OVRPlugin.carsten_is_invert_in_effect_X);
+        Debug.Log("INVERT_Y = " + OVRPlugin.carsten_is_invert_in_effect_Y);
+        Debug.Log("INVERT_Z = " + OVRPlugin.carsten_is_invert_in_effect_Z);
+        Debug.Log("eyeposition = " + rightEye.transform.position.ToString());
+        Debug.Log("Right Hand = " + rightHand.transform.position.ToString());
+ 
+        Debug.Log("eyeposition old Z = " + uninverted_right_eye[2].ToString());
+        Debug.Log("eyeposition new Z = " + rightEye.transform.position.z.ToString());
+        Debug.Log("eyeposition_offset_z = " + eyeposition_offset_z.ToString());
+ 
+        Debug.Log("Right Hand Z org = " + uninverted_right_hand.z.ToString());
+        Debug.Log("Right Hand Z new = " + rightHand.transform.position.z.ToString());
+        float d = rightHand.transform.position.z-uninverted_right_hand[2];
+        Debug.Log("Right Hand dist = " + d.ToString());
+
+        Debug.Log("eyeposition = " + rightEye.transform.position.ToString());
+        
+        Debug.Log("eyeposition_offset_x = " + eyeposition_offset_x.ToString());
+        Debug.Log("eyeposition_offset_y = " + eyeposition_offset_y.ToString());
+        Debug.Log("spawnPosition=" + playarea_center.ToString());
+        Debug.Log("spawnrightEyePosition=" + rightEye.transform.position.ToString());
+        Debug.Log("playarea_min = " + playarea_min.ToString());
+        Debug.Log("playarea_max = " + playarea_max.ToString());
+        Debug.Log("old eye Pos = " + uninverted_right_eye.ToString());
+
         return(playarea_center);
     }
 
@@ -657,7 +813,9 @@ public class Ball_Difficulty
         hand_tremor_freq_cur = 0.0f;
         is_hand_invert_X_cur = false;
         is_hand_invert_Y_cur = false;
-        is_hand_invert_Z_cur = false;
+        // only for testing
+        is_hand_invert_Z_cur = true;
+        //is_hand_invert_Z_cur = false;
         Debug.Log("estimate hand parameter offsets()");
 
         for (int i = 0; i<adaptableItems.Count; i++){
