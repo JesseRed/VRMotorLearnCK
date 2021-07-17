@@ -36,8 +36,14 @@ public class PlayBall : MonoBehaviour {
     private float ball_vel;
     private float time_start_moving;
     public Parameter parameter;
+    private float cur_ball_vel;
     private Vector3 playarea_center; 
     private float ball_duration;
+    private bool is_vel_adaptable;
+    private float ball_vel_max;
+    private int punkte_in_frame;
+    public PunkteHistory punkteHistory;
+    
     // es wird hier nicht immer ein neuer Ball gespawned sondern wir
     // verwenden hier den gleichen Ball
 
@@ -73,10 +79,15 @@ public class PlayBall : MonoBehaviour {
         //myline.SetPosition(0,min);
         //myline.SetPosition(0,max);
         ball_size = gameSession.paradigma.ball_size_max;
-        ball_vel = gameSession.paradigma.ball_veloc_max;
+        //ball_vel = gameSession.paradigma.ball_veloc_max;
         ball_duration = gameSession.paradigma.ball_duration;
         Debug.Log("PlayBall:Awake:ball_duration = "+ ball_duration);
         transform.localScale = new Vector3(ball_size, ball_size, ball_size);
+        cur_ball_vel = gameSession.paradigma.ball_veloc_std;
+        is_vel_adaptable = gameSession.paradigma.adapt_veloc_in_trial;
+        ball_vel_max = gameSession.paradigma.ball_veloc_in_trial_max;
+        //target_diff = parameter.cur_target_difficulty;
+        punkteHistory = new PunkteHistory();
         waitForStart();
     }
     void Start(){
@@ -105,7 +116,8 @@ public class PlayBall : MonoBehaviour {
             playarea_max = parameter.get_playarea_max();
             Debug.Log("after2 ... rightHand.transform.position="+ rightHand.transform.position.ToString());
             Debug.Log("after2 ... Ball.transform.position="+ transform.position.ToString());
-
+            // die berechnete initiale Ballgeschwindigkeit
+            cur_ball_vel = parameter.ballDifficulty.new_ball_veloc;
             // setze die Startzeit des Balls
             time_start_moving = Time.time;
             Debug.Log("time_start_moving = " + time_start_moving);
@@ -145,17 +157,24 @@ public class PlayBall : MonoBehaviour {
             }else{
                 idx = 0;
                 waypointList.RemoveAt(idx);
-                CatmulRom(waypointList, 0.1f);
+                // in trial velocity adaptation
+                if (is_vel_adaptable){
+                    cur_ball_vel = adapt_vel_in_trial(cur_ball_vel);
+                }
+                CatmulRom(waypointList, cur_ball_vel);
             }
             // hier sollten noch andere Parameter
             time_ball_active = Time.time-time_start_moving;
-            //Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
+            Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
             gameSession.add_Ball_Hand_Position(ID, transform.position, rightHand.transform.position, Time.time, time_ball_active);
-            Debug.Log("Ball Position = " + transform.position);
-            Debug.Log("Hand Position = " + rightHand.transform.position);
+            //Debug.Log("Ball Position = " + transform.position);
+            //Debug.Log("Hand Position = " + rightHand.transform.position);
+            // gebe die Infos an parameter Klasse und an die punkteHistory Klasse weiter
             parameter.push_infos(currentFingerBallDist);
+            punkteHistory.add_punkte(currentFingerBallDist, ball_size, time_ball_active);
             if ( time_ball_active>ball_duration){
                 parameter.register_finished_block();
+                parameter.lastBallEndVeloc = cur_ball_vel;
                 parameter.reset_hand();
                 is_stopped = true;
                 is_active = false;
@@ -165,7 +184,33 @@ public class PlayBall : MonoBehaviour {
             }
         }
 	}
-
+    
+    public float adapt_vel_in_trial(float cur_ball_vel){
+        // passe die Ballgeschwindigkeit an
+        // die neue Ballgeschwindigkeit
+        float ball_v = cur_ball_vel;
+        float previous_hit_rate = punkteHistory.get_hit_rate();
+        // wie stark soll die Ballgeschwindigkeit in einem Frame maximal erhoeht werden?
+        // berechne erst die Varianz
+        float vel_var = gameSession.paradigma.ball_veloc_in_trial_max-gameSession.paradigma.ball_veloc_min;
+        // 180 waeren 3 sekunden mit 60 frames d.h. volle Geschwindigkeitsaenderung waere ueber
+        // einen Bereich von 3 Sekunden moeglich
+        float vel_var_per_frame = vel_var/80.0f;
+//        Debug.Log("hit rate = " + punkteHistory.get_hit_rate());
+        if (punkteHistory.get_hit_rate()<gameSession.paradigma.desired_hit_rate){
+            ball_v -= vel_var_per_frame;
+        }else{
+            ball_v += vel_var_per_frame;
+        }
+        if (ball_v > gameSession.paradigma.ball_veloc_in_trial_max){
+            ball_v = gameSession.paradigma.ball_veloc_in_trial_max;
+        }
+        if (ball_v <gameSession.paradigma.ball_veloc_in_trial_min){
+            ball_v = gameSession.paradigma.ball_veloc_in_trial_min;
+        }
+        //target_diff = parameter.cur_target_difficulty;
+        return (ball_v);
+    }
 
     public void waitForStart(){
         Debug.Log("Catmul:waeitForStart()");
@@ -265,5 +310,34 @@ public class PlayBall : MonoBehaviour {
     // }
     public void set_ID(int newID){
         ID = newID;
+    }
+}
+
+public class PunkteHistory{
+    public List<float> fingerBallDist = new List<float>();
+    public List<float> treffer = new List<float>();
+    public List<float> timepoint = new List<float>();
+    public float treffersum = 0.0f;
+    private int list_length = 120;
+
+    public void add_punkte(float dist, float ball_size, float t){
+        fingerBallDist.Add(dist);
+        timepoint.Add(t);
+        if (dist<ball_size/2){treffer.Add(1.0f);}else{treffer.Add(0.0f);}
+        treffersum += treffer[treffer.Count-1];
+        if (fingerBallDist.Count>list_length){
+            treffersum -= treffer[0];
+            fingerBallDist.RemoveAt(0);
+            timepoint.RemoveAt(0);
+            treffer.RemoveAt(0);
+        }       
+        //if ((timepoint[timepoint.Count-1] - timepoint[0])>2.0f){
+
+        
+    }
+
+    public float get_hit_rate(){
+
+        return (treffersum/treffer.Count);
     }
 }

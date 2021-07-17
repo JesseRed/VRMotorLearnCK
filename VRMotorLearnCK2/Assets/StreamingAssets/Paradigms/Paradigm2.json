@@ -47,6 +47,7 @@
     "hand_tremor_freq" : 0,
     "Adaptive": 0,
     "desired_hit_rate": 0.5,
+    "ball_veloc_diff" : 10.0,
     "offset_hand_pos_diff" : 1.0,
     "offset_hand_vel_diff" : 2.0,
     "hand_invert_diff" : 5.0,

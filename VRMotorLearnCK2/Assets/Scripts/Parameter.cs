@@ -68,6 +68,7 @@ public class Parameter : MonoBehaviour
     public float cur_target_difficulty = 50.0f;
     public int punkteBlock = 0;
     public int max_moegliche_punkteBlock = 0;
+    public float lastBallEndVeloc = 0.0f;
     public int punkteLast5Blocks = 0;
     public int max_moegliche_punkteLast5Blocks = 0;
     public int max_moegliche_punkteGesamt = 0;
@@ -204,7 +205,7 @@ public class Parameter : MonoBehaviour
         return(average);
     }
 
-    public void push_infos(float currentFingerBallDist){
+    public int push_infos(float currentFingerBallDist){
         // der Ball ruft bei jedem Update die MEthode auf um die Infos ueber
         // den /FingerBallabstand zu uebergeben
 
@@ -218,6 +219,8 @@ public class Parameter : MonoBehaviour
         // laenge = currentFingerBallDist * 2^x
         // (laenge/currentFingerBallDist) =  2^x
         // x = log(laenge/currentFingerBallDist) zur Basis 2
+        //Debug.Log("laenger ="  + laenge + "  cuFBD = " + currentFingerBallDist.ToString());
+        
         int punkteAdd =  Mathf.RoundToInt(Mathf.Log((laenge / currentFingerBallDist),2));
         if (punkteAdd>10){ punkteAdd = 10; }
         if (punkteAdd <0){ punkteAdd = 0;  }
@@ -230,8 +233,10 @@ public class Parameter : MonoBehaviour
         anzeigeTextPunkteBlock.GetComponent<TextMeshPro>().SetText(punkteBlock.ToString());
         anzeigeTextPunkteGesamt.GetComponent<TextMeshPro>().SetText(punkteGesamt.ToString());
         anzeigeTextDifficulty.GetComponent<TextMeshPro>().SetText(cur_target_difficulty.ToString());
-
+        //Debug.Log("estimated Punkte in push_info ="  + punkteAdd);
+        return (punkteAdd);
     }
+
 
 
 
@@ -245,10 +250,10 @@ public class Parameter : MonoBehaviour
         cur_target_difficulty = estimate_new_target_difficulty();
         Debug.Log("-------------------------------"); 
         Debug.Log("now ballDifficulty.estimate_new_difficulty"); 
+        Debug.Log("cur_target_difficulty = " + cur_target_difficulty);
         ballDifficulty.estimate_new_difficulty(cur_target_difficulty); 
         punkteBlock = 0;
         max_moegliche_punkteBlock = 0;
-
     }
  
     IEnumerator save_uninverted_pos(){
@@ -528,6 +533,14 @@ public class Ball_Difficulty
     //    hand_tremor x 3 Punkte
     //    hand_invert x 5 Punkte
     //    diese Skalierung steht auch mit im Paradigma File
+    //    diese Punkte werden als erstes vergeben.
+    //    Wenn es hiermit nicht moeglich sein sollte den Schwierigkeitsgrad auf das
+    //     Zielniveau anzuheben dann wird als letztes die Geschwindigkeit angepasst
+    //     Fuer die Geschwindigkeit gibt es auch ein ball_veloc_diff value sowie ein min und max value
+    //     der maximale Schwierigkeitsgrad bezieht sich auf die maximale Geschwindigkeit dies erlaubt 
+    //     eine darstellung der Schwierigkeit der Geschwindigkeit im verhaeltnis zur Geschwindigkeit der
+    //     anderen Faktoren
+
 
     // Zur Berechnung des Schwierigkeitsgrades eines neuen Balls wird ein Wert zwischen 0 und 100 uebergeben
     // Dieser WErt wird dann skaliert auf den maximalen Schwierigkeitsgrad 
@@ -571,6 +584,9 @@ public class Ball_Difficulty
     private float hand_tremor_freq_cur = 0.0f;
     public float max_diff_score_norm;
     public float max_diff_score;
+    private float ball_veloc = 0.0f;
+
+    public float new_ball_veloc = 0.0f;
 
     //public List<string> adaptable_Items = new List<string>();
     public List<AdaptableItems> adaptableItems = new List<AdaptableItems>();
@@ -581,6 +597,7 @@ public class Ball_Difficulty
     public void init(GameSession mygameSession){
 
         gameSession = mygameSession;
+
         // in dem gameSession object stehen alle Parameter unter z.B. gameSession.paradigma.offset_hand_pos_X_min;
         create_adpatable_Item_list();
         // berechne die maximal moegliche Schwierigkeit in Punkten
@@ -596,6 +613,7 @@ public class Ball_Difficulty
     public void estimate_new_difficulty(float target_difficulty){
             Debug.Log("now select_qualities_for_hand_alterationselect_qualities_for_hand_alteration"); 
             select_qualities_for_hand_alteration(target_difficulty);
+            
             Debug.Log("now estimate_quatities_for_hand_alteration()");
             estimate_quatities_for_hand_alteration();
     }
@@ -735,6 +753,14 @@ public class Ball_Difficulty
                 }
             );
         }
+        if (gameSession.paradigma.adapt_veloc){
+            max_diff_score += gameSession.paradigma.ball_veloc_diff;
+            // fuer die Anpassung der Ballgeschwindigkeit erstelle ich kein Adaptable Item
+            // da die GEschwindigkeit erst zum schluss aufgefuellt wird
+            // wenn die Schwierigkeitsanforderung anders gedeckt werden kann dann wird 
+            // die Geschwindigkeit auf standard gesetzt (gameSession.paradigma.ball_veloc_std)
+        }
+
 
     }
 
@@ -743,10 +769,10 @@ public class Ball_Difficulty
         // target_diff ist ein WErt zwischen 0 und 100 der die Zielschwierigkeit angiebt die 
         // im Verhaeltnis zu den im Parameterfile dargestellten Interventionen auf die Hand repraesentiert
         max_diff_score_norm = max_diff_score * target_diff / 100.0f;
-        Debug.Log("max_diff_score = " + max_diff_score);
-        Debug.Log("target_diff = " + target_diff);
-        Debug.Log("max_diff_score_norm = " + max_diff_score_norm);
-        
+        //Debug.Log("max_diff_score = " + max_diff_score);
+        //Debug.Log("target_diff = " + target_diff);
+        //Debug.Log("max_diff_score_norm = " + max_diff_score_norm);
+        new_ball_veloc = gameSession.paradigma.ball_veloc_std;
         Random rnd = new Random();
         float current_diff_score = 0.0f;
         List<int> item_num_list = new List<int>();
@@ -756,6 +782,11 @@ public class Ball_Difficulty
         for (int i = 0; i<adaptableItems.Count; i++){item_num_list.Add(i); }
         // setzte alle acivity values auf false 
         for (int i = 0; i<adaptableItems.Count; i++){adaptableItems[i].is_active = false; }
+
+
+        // Zuerst kommen die nicht-adaptable Items
+        // diese sind fest auf den Wert gesetzt und muessen als erstes uebertragen werden
+        // hierbei handelt es sich um feste werte, die nicht in die Schwierigkeitsberechnung eingehen
 
         // setzte in adaptable Items Werte auf true die dann auf die Hand uebertragen werden 
         //  bis die maximale Schwierigkeit erfuellt ist
@@ -770,6 +801,21 @@ public class Ball_Difficulty
             current_diff_score += adaptableItems[item_number].diff_score;
             adaptableItems[item_number].is_active = true;
             idx += 1;
+        }
+        // zum schluss auffuellen mit der Geschwindigkeit
+        // hier bestimme ich dann aber auch schon die Geschwindigkeit
+        if (gameSession.paradigma.adapt_veloc && current_diff_score < max_diff_score_norm){ 
+            // welches Mass an Schwierigkeit fehlt noch?
+            //Debug.Log("Adapt Ball velocity ... ");
+            //Debug.Log("current_diff_score = " + current_diff_score);
+            //Debug.Log("max_diff_score_norm = " + max_diff_score_norm);
+            float req_diff = max_diff_score_norm - current_diff_score;
+            if (req_diff>gameSession.paradigma.ball_veloc_diff){req_diff = gameSession.paradigma.ball_veloc_diff;}
+            float ball_vel_scale = req_diff/ gameSession.paradigma.ball_veloc_diff;
+            new_ball_veloc = gameSession.paradigma.ball_veloc_min + ((gameSession.paradigma.ball_veloc_max-gameSession.paradigma.ball_veloc_min)*ball_vel_scale);
+            if (new_ball_veloc>gameSession.paradigma.ball_veloc_max){new_ball_veloc=gameSession.paradigma.ball_veloc_max;}
+            if (new_ball_veloc<gameSession.paradigma.ball_veloc_min){new_ball_veloc=gameSession.paradigma.ball_veloc_min;}
+            current_diff_score += req_diff;
         }
         Debug.Log("adaptableItems ...activity");
         for (int i = 0; i<adaptableItems.Count; i++){Debug.Log(adaptableItems[i].is_active + " " + adaptableItems[i].is_active);}
@@ -798,24 +844,43 @@ public class Ball_Difficulty
     public void estimate_quatities_for_hand_alteration(){
         // setzte alles auf 0
         // das ist notwendig da in der adaptableItems liste nur die stehen die wirklich adaptiert werden und nicht unbedingt alle
-        offset_hand_pos_X_cur = 0.0f;
-        offset_hand_pos_Y_cur =0.0f;
-        offset_hand_pos_Z_cur= 0.0f; 
-        offset_hand_vel_X_cur= 1.0f; 
-        offset_hand_vel_Y_cur= 1.0f; 
-        offset_hand_vel_Z_cur= 1.0f; 
-        hand_invert_X_cur = 0.0f; 
-        hand_invert_Y_cur = 0.0f; 
-        hand_invert_Z_cur = 0.0f; 
-        hand_tremor_X_cur = 0.0f;
-        hand_tremor_Y_cur = 0.0f;
-        hand_tremor_Z_cur = 0.0f;
-        hand_tremor_freq_cur = 0.0f;
+        // offset_hand_pos_X_cur = 0.0f;
+        // offset_hand_pos_Y_cur =0.0f;
+        // offset_hand_pos_Z_cur= 0.0f; 
+        // offset_hand_vel_X_cur= 1.0f; 
+        // offset_hand_vel_Y_cur= 1.0f; 
+        // offset_hand_vel_Z_cur= 1.0f; 
+        // hand_invert_X_cur = 0.0f; 
+        // hand_invert_Y_cur = 0.0f; 
+        // hand_invert_Z_cur = 0.0f; 
+        // hand_tremor_X_cur = 0.0f;
+        // hand_tremor_Y_cur = 0.0f;
+        // hand_tremor_Z_cur = 0.0f;
+        // hand_tremor_freq_cur = 0.0f;
+        
+        // Nutzung der standardwerte .... wenn nicht adaptable werden diese dann auch nicht angepasst
+        offset_hand_pos_X_cur = gameSession.paradigma.offset_hand_pos_X_min + (gameSession.paradigma.offset_hand_pos_X_max-gameSession.paradigma.offset_hand_pos_X_min)/2.0f;
+        offset_hand_pos_Y_cur = gameSession.paradigma.offset_hand_pos_Y_min + (gameSession.paradigma.offset_hand_pos_Y_max-gameSession.paradigma.offset_hand_pos_Y_min)/2.0f;
+        offset_hand_pos_Z_cur = gameSession.paradigma.offset_hand_pos_Z_min + (gameSession.paradigma.offset_hand_pos_Z_max-gameSession.paradigma.offset_hand_pos_Z_min)/2.0f; 
+        offset_hand_vel_X_cur= gameSession.paradigma.offset_hand_vel_X_min + (gameSession.paradigma.offset_hand_vel_X_max-gameSession.paradigma.offset_hand_vel_X_min)/2.0f;
+        offset_hand_vel_Y_cur= gameSession.paradigma.offset_hand_vel_Y_min + (gameSession.paradigma.offset_hand_vel_Y_max-gameSession.paradigma.offset_hand_vel_Y_min)/2.0f;
+        offset_hand_vel_Z_cur= gameSession.paradigma.offset_hand_vel_Z_min + (gameSession.paradigma.offset_hand_vel_Z_max-gameSession.paradigma.offset_hand_vel_Z_min)/2.0f;
+        hand_invert_X_cur = gameSession.paradigma.hand_invert_X; 
+        hand_invert_Y_cur = gameSession.paradigma.hand_invert_Y; 
+        hand_invert_Z_cur = gameSession.paradigma.hand_invert_Z;
+        hand_tremor_X_cur = gameSession.paradigma.hand_tremor_X;
+        hand_tremor_Y_cur = gameSession.paradigma.hand_tremor_Y;
+        hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
+        hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
+
+        ball_veloc = gameSession.paradigma.ball_veloc_min;
         is_hand_invert_X_cur = false;
+        if (gameSession.paradigma.hand_invert_X>0){ is_hand_invert_X_cur= true;}
         is_hand_invert_Y_cur = false;
-        // only for testing
-        is_hand_invert_Z_cur = true;
-        //is_hand_invert_Z_cur = false;
+        if (gameSession.paradigma.hand_invert_Y>0){ is_hand_invert_Y_cur= true;}
+        is_hand_invert_Z_cur = false;
+        if (gameSession.paradigma.hand_invert_Z>0){ is_hand_invert_Z_cur= true;}
+
         Debug.Log("estimate hand parameter offsets()");
 
         for (int i = 0; i<adaptableItems.Count; i++){
@@ -860,6 +925,10 @@ public class Ball_Difficulty
                         hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
                         break;
                     case "adapt_tremor_Z":
+                        hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
+                        hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
+                        break;
+                    case "adapt_veloc":
                         hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
                         hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
                         break;

@@ -222,8 +222,12 @@ public class BallPositionInfo
     public float ball_duration;
     public float ball_size_max;
     public float ball_size_min;
+    
     public float ball_veloc_min;
+    public float ball_veloc_std;
     public float ball_veloc_max;
+    public float ball_veloc_in_trial_min;
+    public float ball_veloc_in_trial_max;
     public float ball_mass;
     public float playarea_min_x;
     public float playarea_min_y;
@@ -265,6 +269,7 @@ public class BallPositionInfo
     public float hand_tremor_Z;
     public float hand_tremor_freq;
     public int Adaptive;
+    public float ball_veloc_diff;
     public float desired_hit_rate;
     public float offset_hand_pos_diff;
     public float offset_hand_vel_diff;
@@ -290,6 +295,7 @@ public class BallPositionInfo
     public float spiegelpunkt_der_invertierung_y;
     public float spiegelpunkt_der_invertierung_z;
     
+
 
     }
 
