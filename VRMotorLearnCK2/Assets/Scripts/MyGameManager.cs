@@ -83,7 +83,7 @@ public class MyGameManager : MonoBehaviour
         //parameter.set_bounding_box_to_play();
         //SpawnNewBall();
 
-        anzeigeText.GetComponent<TextMeshPro>().SetText("!!Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
+        anzeigeText.GetComponent<TextMeshPro>().SetText("Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
   
         StartCoroutine(spawnmanagement());
         
@@ -113,8 +113,8 @@ public class MyGameManager : MonoBehaviour
         //    Debug.Log("MyGameManager:spawnmanagement parameter.is_playarea_initialized ... now SpawnNewBall");
             if (cloneplayBall) { 
                 //Debug.Log("MyGameManager:spawnmanagmement: cloneplayBall exists");
-                anzeigeText.GetComponent<TextMeshPro>().SetText("cloneplayBAll Versuchen sie mit dem Zeigefinger \nimmmer im Kontakt mit dem Ball zu bleiben");
-                    
+                anzeigeText.GetComponent<TextMeshPro>().SetText("Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
+  
                 yield return new WaitForSeconds(2.0f);
             }
             if (! cloneplayBall) {

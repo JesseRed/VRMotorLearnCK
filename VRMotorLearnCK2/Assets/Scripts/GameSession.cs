@@ -277,6 +277,7 @@ public class BallPositionInfo
     public float hand_tremor_diff;
     public bool adapt_ball_size;
     public bool adapt_veloc_in_trial;
+    public int adapt_veloc_in_trial_based_on_last_framenum;
     public bool adapt_veloc;
     public bool adapt_offset_hand_pos_X;
     public bool adapt_offset_hand_pos_Y;

@@ -88,6 +88,8 @@ public class PlayBall : MonoBehaviour {
         ball_vel_max = gameSession.paradigma.ball_veloc_in_trial_max;
         //target_diff = parameter.cur_target_difficulty;
         punkteHistory = new PunkteHistory();
+        Debug.Log("gameSession.paradigma.adapt_veloc_in_trial_based_on_last_framenum"+gameSession.paradigma.adapt_veloc_in_trial_based_on_last_framenum.ToString());
+        punkteHistory.setHistoryLength(Mathf.RoundToInt(gameSession.paradigma.adapt_veloc_in_trial_based_on_last_framenum));
         waitForStart();
     }
     void Start(){
@@ -170,8 +172,10 @@ public class PlayBall : MonoBehaviour {
             //Debug.Log("Ball Position = " + transform.position);
             //Debug.Log("Hand Position = " + rightHand.transform.position);
             // gebe die Infos an parameter Klasse und an die punkteHistory Klasse weiter
-            parameter.push_infos(currentFingerBallDist);
+
             punkteHistory.add_punkte(currentFingerBallDist, ball_size, time_ball_active);
+            Debug.Log("punkteHistorz.getHitRAte = " +  punkteHistory.get_hit_rate());
+            parameter.push_infos(currentFingerBallDist, punkteHistory.get_hit_rate());
             if ( time_ball_active>ball_duration){
                 parameter.register_finished_block();
                 parameter.lastBallEndVeloc = cur_ball_vel;
@@ -320,6 +324,13 @@ public class PunkteHistory{
     public float treffersum = 0.0f;
     private int list_length = 120;
 
+    // ich muss hier bei der init noch den parameter uebergeben
+    // init mit adapt_veloc_in_trial_based_on_last_framenum
+
+    public void setHistoryLength(int l){
+        Debug.Log("newlistlength = "+ l.ToString());
+        list_length = l;
+    }
     public void add_punkte(float dist, float ball_size, float t){
         fingerBallDist.Add(dist);
         timepoint.Add(t);

@@ -81,7 +81,8 @@ public class Parameter : MonoBehaviour
     public GameObject anzeigeTextPunkteBlock;
     public GameObject anzeigeTextPunkteGesamt;
     public GameObject anzeigeTextDifficulty;
-    
+    public GameObject anzeigeTextTargetRate;
+
 
     public Ball_Difficulty ballDifficulty; 
     // Start is called before the first frame update
@@ -205,7 +206,7 @@ public class Parameter : MonoBehaviour
         return(average);
     }
 
-    public int push_infos(float currentFingerBallDist){
+    public int push_infos(float currentFingerBallDist, float currentInBlockHitRate){
         // der Ball ruft bei jedem Update die MEthode auf um die Infos ueber
         // den /FingerBallabstand zu uebergeben
 
@@ -233,6 +234,9 @@ public class Parameter : MonoBehaviour
         anzeigeTextPunkteBlock.GetComponent<TextMeshPro>().SetText(punkteBlock.ToString());
         anzeigeTextPunkteGesamt.GetComponent<TextMeshPro>().SetText(punkteGesamt.ToString());
         anzeigeTextDifficulty.GetComponent<TextMeshPro>().SetText(cur_target_difficulty.ToString());
+        anzeigeTextTargetRate.GetComponent<TextMeshPro>().SetText(currentInBlockHitRate.ToString("n2"));
+        
+
         //Debug.Log("estimated Punkte in push_info ="  + punkteAdd);
         return (punkteAdd);
     }

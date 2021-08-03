@@ -9,6 +9,7 @@
     "ball_veloc_min": 0.1,
     "ball_veloc_max": 0.6,
     "adapt_veloc_in_trial" : true,
+    "adapt_veloc_in_trial_based_on_last_framenum" : 120.0,
     "ball_veloc_in_trial_min": 0.01,
     "ball_veloc_in_trial_max": 2.0,
     "playarea_min_x": -0.2,
