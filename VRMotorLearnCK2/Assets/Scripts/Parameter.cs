@@ -255,6 +255,7 @@ public class Parameter : MonoBehaviour
         Debug.Log("-------------------------------"); 
         Debug.Log("now ballDifficulty.estimate_new_difficulty"); 
         Debug.Log("cur_target_difficulty = " + cur_target_difficulty);
+        Debug.Log("no_ball_duration = " + gameSession.paradigma.no_ball_duration.ToString());
         ballDifficulty.estimate_new_difficulty(cur_target_difficulty); 
         punkteBlock = 0;
         max_moegliche_punkteBlock = 0;

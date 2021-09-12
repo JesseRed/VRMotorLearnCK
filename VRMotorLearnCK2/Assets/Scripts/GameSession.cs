@@ -220,6 +220,8 @@ public class BallPositionInfo
     public int numBalls;
     public float target_size;
     public float ball_duration;
+    public float no_ball_duration;
+    
     public float ball_size_max;
     public float ball_size_min;
     

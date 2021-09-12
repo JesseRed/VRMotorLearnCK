@@ -101,6 +101,20 @@ public class MyGameManager : MonoBehaviour
         //SpawnNewBall();
     }
 
+    IEnumerator inter_ball_counter(){
+        //zeigt den Counter bis zum erscheinen des naechsten Balls
+        int duration = (int) gameSession.paradigma.no_ball_duration;
+        anzeigeText.GetComponent<TextMeshPro>().SetText("Weiter in ...\n " + duration.ToString() + "\n Sekunden");
+        while (duration>0)
+        {
+            
+            yield return new WaitForSeconds(1.0f);
+            duration--;
+            anzeigeText.GetComponent<TextMeshPro>().SetText("Weiter in ...\n " + duration.ToString() + "\n Sekunden");
+  
+
+        }
+    }
 
     IEnumerator spawnmanagement()
     {
@@ -125,7 +139,8 @@ public class MyGameManager : MonoBehaviour
                     yield break;
                 }
                 Debug.Log("MyGameManager:spawnmanagmement: no cloneplayBall -> instantiate new one");
-                yield return new WaitForSeconds(1.0f);
+                yield return StartCoroutine(inter_ball_counter());
+//               yield return new WaitForSeconds(1.0f);
 
                 
                 // Debug.Log("before............");
@@ -166,6 +181,9 @@ public class MyGameManager : MonoBehaviour
         // // StartCoroutine(MoveTheBall(ball, spawnPosition, 5.0f));
     }
 
+    public void show_counter(){
+
+    }
 
     public void SpawnNewBall()
     {
