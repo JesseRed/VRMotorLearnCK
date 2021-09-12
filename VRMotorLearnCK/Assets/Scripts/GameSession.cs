@@ -257,7 +257,7 @@ public class BallPositionInfo
 
     public int numBalls;
     public float target_size;
-
+    public bool show_inner_rings;
     public float ball_mass;
 
     public float gravity_X_min;

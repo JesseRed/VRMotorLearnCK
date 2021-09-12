@@ -8,7 +8,7 @@ public class LineObj : MonoBehaviour
 
     public float lineDrawSpeed = 6f;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         line = GetComponent<LineRenderer>();
         //lineRenderer.SetPosition(0, new Vector3(-1f, 0.3f, -0.7f));
@@ -21,7 +21,7 @@ public class LineObj : MonoBehaviour
         // //dist = Vector3.Distance(origin.position, destination.position);
         
         // Vector3 pointZero = new Vector3( origin.position.x, origin.position.y, origin.position.z ); //transform.position.x, transform.position.y, transform.z);
-        // Debug.Log(origin.position.x + origin.position.y + " " + origin.position.z);
+        // Debug.Log(origin.position.x + origin.posi+tion.y + " " + origin.position.z);
         // Vector3 pointA = new Vector3(-1f, -0.1f, -0.7f);
         // Vector3 pointB = new Vector3(1f, -0.1f, -0.7f);
         // lineRenderer.SetPosition(0, pointA);
