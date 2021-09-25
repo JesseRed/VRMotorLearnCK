@@ -617,6 +617,7 @@ public class Ball_Difficulty
 
     public void estimate_new_difficulty(float target_difficulty){
             Debug.Log("now select_qualities_for_hand_alterationselect_qualities_for_hand_alteration"); 
+            Debug.Log("target difficulty = " + target_difficulty.ToString()); 
             select_qualities_for_hand_alteration(target_difficulty);
             
             Debug.Log("now estimate_quatities_for_hand_alteration()");
@@ -774,9 +775,10 @@ public class Ball_Difficulty
         // target_diff ist ein WErt zwischen 0 und 100 der die Zielschwierigkeit angiebt die 
         // im Verhaeltnis zu den im Parameterfile dargestellten Interventionen auf die Hand repraesentiert
         max_diff_score_norm = max_diff_score * target_diff / 100.0f;
-        //Debug.Log("max_diff_score = " + max_diff_score);
-        //Debug.Log("target_diff = " + target_diff);
-        //Debug.Log("max_diff_score_norm = " + max_diff_score_norm);
+        Debug.Log("in select_qualities_for_hand_alteration");
+        Debug.Log("max_diff_score = " + max_diff_score);
+        Debug.Log("target_diff = " + target_diff);
+        Debug.Log("max_diff_score_norm = " + max_diff_score_norm);
         new_ball_veloc = gameSession.paradigma.ball_veloc_std;
         Random rnd = new Random();
         float current_diff_score = 0.0f;
@@ -796,6 +798,7 @@ public class Ball_Difficulty
         // setzte in adaptable Items Werte auf true die dann auf die Hand uebertragen werden 
         //  bis die maximale Schwierigkeit erfuellt ist
         while (current_diff_score < max_diff_score_norm && idx<adaptableItems.Count){
+            Debug.Log("in while loop with current_diff_score =" + current_diff_score.ToString());
             // waehle eine Zufallszahl 
             int my_rand = Random.Range(0,item_num_list.Count-1);
             // die item_number ist nun ein zufaelliger Index von adpatable Items der
@@ -823,7 +826,7 @@ public class Ball_Difficulty
             current_diff_score += req_diff;
         }
         Debug.Log("adaptableItems ...activity");
-        for (int i = 0; i<adaptableItems.Count; i++){Debug.Log(adaptableItems[i].is_active + " " + adaptableItems[i].is_active);}
+        for (int i = 0; i<adaptableItems.Count; i++){Debug.Log(adaptableItems[i].name.ToString() + " " + adaptableItems[i].is_active);}
         Debug.Log("-----------------------------------------");
     }
 
@@ -878,7 +881,7 @@ public class Ball_Difficulty
         hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
         hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
 
-        ball_veloc = gameSession.paradigma.ball_veloc_min;
+        ball_veloc = gameSession.paradigma.ball_veloc_std;
         is_hand_invert_X_cur = false;
         if (gameSession.paradigma.hand_invert_X>0){ is_hand_invert_X_cur= true;}
         is_hand_invert_Y_cur = false;
@@ -887,59 +890,184 @@ public class Ball_Difficulty
         if (gameSession.paradigma.hand_invert_Z>0){ is_hand_invert_Z_cur= true;}
 
         Debug.Log("estimate hand parameter offsets()");
+        // in der adaptableItems Liste stehen nur die Items die adaptierbar sind alle anderen muessen false sein
 
+        // for (int i = 0; i<adaptableItems.Count; i++){
+        //     if (adaptableItems[i].is_active){
+        //         switch (adaptableItems[i].name){
+        //             case "adapt_offset_hand_pos_X":
+        //                 offset_hand_pos_X_cur = Random.Range(gameSession.paradigma.offset_hand_pos_X_min, gameSession.paradigma.offset_hand_pos_X_max);
+        //                 break;
+        //             case "adapt_offset_hand_pos_Y":
+        //                 offset_hand_pos_Y_cur = Random.Range(gameSession.paradigma.offset_hand_pos_Y_min, gameSession.paradigma.offset_hand_pos_Y_max);
+        //                 break;
+        //             case "adapt_offset_hand_pos_Z":
+        //                 offset_hand_pos_Z_cur = Random.Range(gameSession.paradigma.offset_hand_pos_Z_min, gameSession.paradigma.offset_hand_pos_Z_max);
+        //                 break;
+        //             case "adapt_offset_hand_vel_X":
+        //                 offset_hand_vel_X_cur = Random.Range(gameSession.paradigma.offset_hand_vel_X_min, gameSession.paradigma.offset_hand_vel_X_max);
+        //                 break;
+        //             case "adapt_offset_hand_vel_Y":
+        //                 offset_hand_vel_Y_cur = Random.Range(gameSession.paradigma.offset_hand_vel_Y_min, gameSession.paradigma.offset_hand_vel_Y_max);
+        //                 break;
+        //             case "adapt_offset_hand_vel_Z":
+        //                 offset_hand_vel_Z_cur = Random.Range(gameSession.paradigma.offset_hand_vel_Z_min, gameSession.paradigma.offset_hand_vel_Z_max);
+        //                 break;
+        //             case "adapt_invert_X":
+        //                 hand_invert_X_cur = 1.0f;
+        //                 is_hand_invert_X_cur = true;
+        //                 break;
+        //             case "adapt_invert_Y":
+        //                 hand_invert_Y_cur = 1.0f;
+        //                 is_hand_invert_Y_cur = true;
+        //                 break;
+        //             case "adapt_invert_Z":
+        //                 hand_invert_Z_cur = 1.0f;
+        //                 is_hand_invert_Z_cur = true;
+        //                 break;
+        //             case "adapt_tremor_X":
+        //                 hand_tremor_X_cur = gameSession.paradigma.hand_tremor_X;
+        //                 hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
+        //                 break;
+        //             case "adapt_tremor_Y":
+        //                 hand_tremor_Y_cur = gameSession.paradigma.hand_tremor_Y;
+        //                 hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
+        //                 break;
+        //             case "adapt_tremor_Z":
+        //                 hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
+        //                 hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
+        //                 break;
+        //             case "adapt_veloc":
+        //                 hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
+        //                 hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
+        //                 break;
+        //         }
+        //     }
+        // }
+
+
+        // changes 20210925
+        // die adaptableItems.is_active = false wurden zuvor nicht ausgeschaltet
         for (int i = 0; i<adaptableItems.Count; i++){
-            if (adaptableItems[i].is_active){
-                switch (adaptableItems[i].name){
-                    case "adapt_offset_hand_pos_X":
+            switch (adaptableItems[i].name){
+                case "adapt_offset_hand_pos_X":
+                    if (adaptableItems[i].is_active){
                         offset_hand_pos_X_cur = Random.Range(gameSession.paradigma.offset_hand_pos_X_min, gameSession.paradigma.offset_hand_pos_X_max);
                         break;
-                    case "adapt_offset_hand_pos_Y":
+                    }else{
+                        offset_hand_pos_X_cur = 0.0f;
+                        break;
+                    }
+                case "adapt_offset_hand_pos_Y":
+                    if (adaptableItems[i].is_active){
                         offset_hand_pos_Y_cur = Random.Range(gameSession.paradigma.offset_hand_pos_Y_min, gameSession.paradigma.offset_hand_pos_Y_max);
                         break;
-                    case "adapt_offset_hand_pos_Z":
+                    }else{
+                        offset_hand_pos_Y_cur = 0.0f;
+                        break;
+                    }
+                case "adapt_offset_hand_pos_Z":
+                    if (adaptableItems[i].is_active){
                         offset_hand_pos_Z_cur = Random.Range(gameSession.paradigma.offset_hand_pos_Z_min, gameSession.paradigma.offset_hand_pos_Z_max);
                         break;
-                    case "adapt_offset_hand_vel_X":
+                    }else{
+                        offset_hand_pos_Z_cur = 0.0f;
+                        break;
+                    }
+                case "adapt_offset_hand_vel_X":
+                    if (adaptableItems[i].is_active){
                         offset_hand_vel_X_cur = Random.Range(gameSession.paradigma.offset_hand_vel_X_min, gameSession.paradigma.offset_hand_vel_X_max);
                         break;
-                    case "adapt_offset_hand_vel_Y":
+                    }else{
+                        offset_hand_vel_X_cur = 1.0f;
+                        break;
+                    }                    
+                case "adapt_offset_hand_vel_Y":
+                    if (adaptableItems[i].is_active){
                         offset_hand_vel_Y_cur = Random.Range(gameSession.paradigma.offset_hand_vel_Y_min, gameSession.paradigma.offset_hand_vel_Y_max);
                         break;
-                    case "adapt_offset_hand_vel_Z":
+                    }else{
+                        offset_hand_vel_Y_cur = 1.0f;
+                        break;
+                    }      
+                case "adapt_offset_hand_vel_Z":
+                    if (adaptableItems[i].is_active){
                         offset_hand_vel_Z_cur = Random.Range(gameSession.paradigma.offset_hand_vel_Z_min, gameSession.paradigma.offset_hand_vel_Z_max);
                         break;
-                     case "adapt_invert_X":
+                    }else{
+                        offset_hand_vel_Z_cur = 1.0f;
+                        break;
+                    }    
+                case "adapt_invert_X":
+                    if (adaptableItems[i].is_active){
                         hand_invert_X_cur = 1.0f;
                         is_hand_invert_X_cur = true;
                         break;
-                    case "adapt_invert_Y":
+                    }else{
+                        hand_invert_X_cur = 0.0f;
+                        is_hand_invert_X_cur = false;
+                        break;
+                    }    
+                case "adapt_invert_Y":
+                    if (adaptableItems[i].is_active){
                         hand_invert_Y_cur = 1.0f;
                         is_hand_invert_Y_cur = true;
                         break;
-                    case "adapt_invert_Z":
+                    }else{
+                        hand_invert_Y_cur = 0.0f;
+                        is_hand_invert_Y_cur = false;
+                        break;
+                    }   
+                case "adapt_invert_Z":
+                    if (adaptableItems[i].is_active){
                         hand_invert_Z_cur = 1.0f;
                         is_hand_invert_Z_cur = true;
                         break;
-                    case "adapt_tremor_X":
+                    }else{
+                        hand_invert_Z_cur = 0.0f;
+                        is_hand_invert_Z_cur = false;
+                        break;
+                    }    
+                case "adapt_tremor_X":
+                    if (adaptableItems[i].is_active){
                         hand_tremor_X_cur = gameSession.paradigma.hand_tremor_X;
                         hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
                         break;
-                    case "adapt_tremor_Y":
+                    }else{
+                        hand_tremor_X_cur = 0.0f;
+                        break;
+                    }    
+
+                case "adapt_tremor_Y":
+                    if (adaptableItems[i].is_active){
                         hand_tremor_Y_cur = gameSession.paradigma.hand_tremor_Y;
                         hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
                         break;
-                    case "adapt_tremor_Z":
+                    }else{
+                        hand_tremor_Y_cur = 0.0f;
+                        break;
+                    }    
+                case "adapt_tremor_Z":
+                    if (adaptableItems[i].is_active){
                         hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
                         hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
                         break;
-                    case "adapt_veloc":
-                        hand_tremor_Z_cur = gameSession.paradigma.hand_tremor_Z;
-                        hand_tremor_freq_cur = gameSession.paradigma.hand_tremor_freq;
+                    }else{
+                        hand_tremor_Z_cur = 0.0f;
                         break;
-                }
+                    }   
+                case "adapt_veloc":
+                    if (adaptableItems[i].is_active){
+                        ball_veloc = Random.Range(gameSession.paradigma.ball_size_min, gameSession.paradigma.ball_size_max); 
+                        break;
+                    }else{
+                        ball_veloc = gameSession.paradigma.ball_veloc_std;
+                        break;
+                    }  
             }
+            
         }
+
         // Vector3 offset_hand_pos = new Vector3(offset_hand_pos_X_cur, offset_hand_pos_Y_cur, offset_hand_pos_Z_cur);
         // Vector3 offset_hand_vel = new Vector3(offset_hand_vel_X_cur, offset_hand_vel_Y_cur, offset_hand_vel_Z_cur);
         // Vector3 invert = new Vector3(hand_invert_X_cur, hand_invert_Y_cur, hand_invert_Z_cur);

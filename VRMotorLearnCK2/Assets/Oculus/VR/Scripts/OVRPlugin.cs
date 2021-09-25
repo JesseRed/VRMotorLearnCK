@@ -2053,10 +2053,10 @@ public static class OVRPlugin
 			// 	Debug.Log("carsten invert = " + carsten_invert.ToString());
 				//Debug.Log("In InVERTED Position save_posef = " + save_posef.Position.ToString());
 			if (first_time_debug && carsten_invert[2]>0.1f){
-					Debug.Log("In InVERTED Position Z before to invert = " + tmp.Position.z.ToString());
+					// Debug.Log("In InVERTED Position Z before to invert = " + tmp.Position.z.ToString());
 			}
 			if (carsten_invert[2]>0.1f){
-				Debug.Log("In InVERTED Position Z before to invert = " + tmp.Position.z.ToString());
+				// Debug.Log("In InVERTED Position Z before to invert = " + tmp.Position.z.ToString());
 			}
 				// tmp.Position.x += (tmp.Position.x-save_posef.Position.x) *carsten_invert[0] *-1.0f;
 				// tmp.Position.y += (tmp.Position.y-save_posef.Position.y) *carsten_invert[1];
@@ -2108,14 +2108,14 @@ public static class OVRPlugin
 
 
 			if (first_time_debug && carsten_invert[2]>0.1f){
-					Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
-					Debug.Log("carsten_spiegelpunkt_der_invertierung  = " + carsten_spiegelpunkt_der_invertierung.ToString());
+					// Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
+					// Debug.Log("carsten_spiegelpunkt_der_invertierung  = " + carsten_spiegelpunkt_der_invertierung.ToString());
 					
-					Debug.Log("In InVERTED Position after to invert = " + tmp.Position.z.ToString());
+					// Debug.Log("In InVERTED Position after to invert = " + tmp.Position.z.ToString());
 					first_time_debug=false;
 			}
 			if (carsten_invert[2]>0.1f){
-				Debug.Log("In INVERTED Position after to invert = " + tmp.Position.z.ToString());
+				// Debug.Log("In INVERTED Position after to invert = " + tmp.Position.z.ToString());
 			}
 			// if (first_time_debug && carsten_invert[0]>0.1f){
 			// 		Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
