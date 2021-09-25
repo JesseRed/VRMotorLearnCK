@@ -345,6 +345,7 @@ MonoBehaviour:
     numBalls: 0
     target_size: 0
     show_inner_rings: 0
+    keep_target_ring_constant: 0
     ball_mass: 0
     gravity_X_min: 0
     gravity_X_max: 0
@@ -2159,7 +2160,7 @@ GameObject:
   - component: {fileID: 842290801}
   - component: {fileID: 842290800}
   m_Layer: 0
-  m_Name: AnzeigeText (1)
+  m_Name: AnzeigeText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17138,6 +17139,7 @@ MonoBehaviour:
   gameSession: {fileID: 0}
   parameter: {fileID: 0}
   anzeigeTextBall: {fileID: 1590342267}
+  anzeigeText: {fileID: 842290798}
   anzeigeTextTreffer: {fileID: 43133155}
 --- !u!4 &1894177529
 Transform:

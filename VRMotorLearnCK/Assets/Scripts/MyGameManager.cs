@@ -20,6 +20,7 @@ public class MyGameManager : MonoBehaviour
     public LineObj line1;
     public LineObj line2;
     public LineObj line3;
+    public float gametime;
     public GameObject lineObj_i1;
     public GameObject lineObj_i2;
     public GameObject lineObj_i3;
@@ -32,7 +33,8 @@ public class MyGameManager : MonoBehaviour
     private int punkteGesamt;
     public GameSession gameSession;
     public Parameter parameter;
-        public GameObject anzeigeTextBall;
+    public GameObject anzeigeTextBall;
+    public GameObject anzeigeText;
     public GameObject anzeigeTextTreffer;
     
 
@@ -72,12 +74,18 @@ public class MyGameManager : MonoBehaviour
     public void SpawnNewBall()
     {
         current_ball_id += 1;
-        anzeigeTextBall.GetComponent<TextMeshPro>().SetText(current_ball_id.ToString());
-        //gameSession.register_new_Ball(current_ball_id);
-        parameter.configureParameterForNextBall();
-        spawner.Spawn_A_NewBall();
-        //lineObj.drawCircleX(get_current_target_radius(), 0.061f);
-        //Debug.Log("current ball target = " + get_current_target_radius());
+
+        if (current_ball_id+1>gameSession.paradigma.numBalls || Time.time>gameSession.paradigma.duration_in_sec){
+            anzeigeTextBall.GetComponent<TextMeshPro>().SetText("Ende");
+            anzeigeText.GetComponent<TextMeshPro>().SetText("Das Spiel ist vorbei. Sie koennen das Headset jetzt absetzen!");
+        }else{
+            anzeigeTextBall.GetComponent<TextMeshPro>().SetText(current_ball_id.ToString());
+            //gameSession.register_new_Ball(current_ball_id);
+            parameter.configureParameterForNextBall();
+            spawner.Spawn_A_NewBall();
+            //lineObj.drawCircleX(get_current_target_radius(), 0.061f);
+            //Debug.Log("current ball target = " + get_current_target_radius());
+        }
     }
 
     public int get_current_Ball_ID(){

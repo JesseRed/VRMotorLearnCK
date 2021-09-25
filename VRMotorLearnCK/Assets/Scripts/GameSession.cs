@@ -256,6 +256,7 @@ public class BallPositionInfo
     {
 
     public int numBalls;
+    public int duration_in_sec;
     public float target_size;
     public bool show_inner_rings;
     public bool keep_target_ring_constant;
