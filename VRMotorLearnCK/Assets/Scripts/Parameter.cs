@@ -96,7 +96,11 @@ public class Parameter : MonoBehaviour
         //rightHandAnchor.Position = 
         current_general_difficulty = estimate_current_general_difficulty();
         Debug.Log("into configure_ParameterForNextBall");
-        current_target_radius = estimate_current_target_radius(current_target_radius);
+        if (gameSession.paradigma.keep_target_ring_constant){
+            current_target_radius = current_target_radius;
+        }else{
+            current_target_radius = estimate_current_target_radius(current_target_radius);
+        }
         Debug.Log("current_target_radius = " + current_target_radius);
         //* Estimate Gravity ggf. change in 
         current_gravity = estimate_current_gravity();

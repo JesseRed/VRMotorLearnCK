@@ -60,7 +60,10 @@ private GameObject rightEye;
         ovrPlayerController = FindObjectOfType<OVRPlayerController>();
         wall = GameObject.Find("Wall");
         drawDot = FindObjectOfType<DrawDot>();
-        lineObj = FindObjectOfType<LineObj>();
+        //lineObj = FindObjectOfType<LineObj>();
+        lineObj = myGameManager.lineObj.GetComponent<LineObj>();
+		//FindObjectOfType<LineObj>();
+        //lineObj = GameObject.Find("LineObj");
 
         //rightHand = GameObject.Find("CustomHandRight");
         rightHand = GameObject.Find("RightHandAnchor");

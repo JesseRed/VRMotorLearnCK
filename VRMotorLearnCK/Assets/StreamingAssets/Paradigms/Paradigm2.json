@@ -1,6 +1,8 @@
 {
-    "numBalls":2,
+    "numBalls":3,
     "target_size": 0.3,
+    "show_inner_rings": false,
+    "keep_target_ring_constant": false,
     "ball_mass": 1.11,
     "gravity_X_min" :  0.0,
     "gravity_X_max" :  0.0,
