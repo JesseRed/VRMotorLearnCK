@@ -16,7 +16,13 @@ public class MyGameManager : MonoBehaviour
     public string dataFolderName = Path.Combine(Application.streamingAssetsPath, "Data"); 
     public string datafilename = "tmpsave.json";
     //public PlayerData playerData;
-    public LineObj lineObj;
+    public GameObject lineObj;
+    public LineObj line1;
+    public LineObj line2;
+    public LineObj line3;
+    public GameObject lineObj_i1;
+    public GameObject lineObj_i2;
+    public GameObject lineObj_i3;
     private int current_ball_id = -1;
     //public float current_target_radius = 0.2f;
     private OVRCameraRig ovrCameraRig;
@@ -38,7 +44,10 @@ public class MyGameManager : MonoBehaviour
         SetUpSingleton();
         gameSession = FindObjectOfType<GameSession>();
         parameter = FindObjectOfType<Parameter>();
-        lineObj = FindObjectOfType<LineObj>(); // Zeichnet den Zielkreis auf die Wand
+        // die lineObj sind dem MzGameManager per hand im Inspection Manager zugewiesen
+        //lineObj = FindObjectOfType<LineObj>(); // Zeichnet den Zielkreis auf die Wand
+        // lineObj = GameObject.Find("lineObj")
+
         spawner = FindObjectOfType<Spawner>();
         wall = GameObject.Find("Wall");
         Debug.Log(gameSession.paradigma.ToString());
@@ -110,6 +119,26 @@ public class MyGameManager : MonoBehaviour
     {
         ovrPlayerController = FindObjectOfType<OVRPlayerController>();
         ovrCameraRig = FindObjectOfType<OVRCameraRig>();
+
+        line1 = lineObj_i1.GetComponent<LineObj>();
+        line2 = lineObj_i2.GetComponent<LineObj>();
+        line3 = lineObj_i3.GetComponent<LineObj>();
+
+        if (gameSession.paradigma.show_inner_rings){
+            line1.drawCircleX(0.01f, 0.051f);
+            line2.drawCircleX(0.1f, 0.051f);
+            line3.drawCircleX(0.2f, 0.051f);
+            
+         }else{
+            line1.transform.localScale = new Vector3(0,0,0);
+            line2.transform.localScale = new Vector3(0,0,0);
+            line3.transform.localScale = new Vector3(0,0,0);
+          //  lineObj_i2.transform.localScale = new Vector3(0,0,0);
+            //lineObj_i3.transform.localScale = new Vector3(0,0,0);
+            // lineObj_i2.drawCircleX(0.001f, 0.001f);
+            // lineObj_i3.drawCircleX(0.001f, 0.001f);
+        }
+
         StartCoroutine (CompensateHeadPosition());
         SpawnNewBall();
     }
